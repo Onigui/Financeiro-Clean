@@ -3,244 +3,1638 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Financeiro Clean – Offline PRO (Fix)</title>
+<title>Financeiro Clean PRO – Controle Financeiro Pessoal</title>
 <style>
-  :root{--bg:#fff;--fg:#0f172a;--muted:#f1f5f9;--muted-fg:#64748b;--border:#e2e8f0;--accent:#2563eb;--ring:rgba(15,23,42,.06)}
-  *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  :root{
+    --bg:#fff;
+    --fg:#0f172a;
+    --muted:#f1f5f9;
+    --muted-fg:#64748b;
+    --border:#e2e8f0;
+    --accent:#2563eb;
+    --ring:rgba(15,23,42,.06);
+    --success:#16a34a;
+    --warning:#f59e0b;
+    --danger:#dc2626;
+    --info:#0ea5e9;
+  }
+  *{box-sizing:border-box} 
+  html,body{height:100%} 
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+  }
   .container{max-width:1200px;margin:0 auto;padding:16px}
-  .topbar{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--border);z-index:20}
-  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.spacer{flex:1}
-  .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);padding:8px 10px;border-radius:12px;background:#fff;cursor:pointer;box-shadow:0 8px 20px -12px var(--ring);white-space:nowrap}
-  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)} .btn.ghost{border-color:transparent;background:transparent} .btn.icon{width:36px;height:36px;justify-content:center}
-  .card{border:1px solid var(--border);border-radius:16px;background:#fff;box-shadow:0 12px 28px -18px var(--ring)} .card .hd{padding:14px 16px 6px 16px;font-weight:600} .card .bd{padding:10px 16px 16px 16px}
-  .grid{display:grid;gap:12px} .grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))} .grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))} .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-  @media (max-width:980px){.grid.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))} .grid.cols-3{grid-template-columns:repeat(1,minmax(0,1fr))}} @media (max-width:640px){.grid.cols-4{grid-template-columns:repeat(1,minmax(0,1fr))}}
-  .label{font-size:12px;color:var(--muted-fg);margin-bottom:4px;display:block} .input,.select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;outline:none}
-  .input:focus,.select:focus{box-shadow:0 0 0 4px var(--ring)} .kpi{font-size:22px;font-weight:600} .muted{color:var(--muted-fg)} .sep{height:1px;background:var(--border);margin:6px 0}
-  table{width:100%;border-collapse:collapse} thead th{background:var(--muted);text-align:left;padding:10px;border-bottom:1px solid var(--border);font-weight:600} tbody td{padding:10px;border-bottom:1px solid var(--border)}
-  tr:hover td{background:#fafafa} .right{text-align:right} .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:4px 8px;font-size:12px;background:#fff} .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
-  .pilltabs{display:inline-flex;border:1px solid var(--border);padding:4px;border-radius:12px;background:#fff} .pilltabs button{border:0;background:transparent;padding:6px 10px;border-radius:8px;cursor:pointer} .pilltabs button[data-active="true"]{background:var(--muted)}
-  .chart{width:100%;height:220px;border:1px solid var(--border);border-radius:12px;display:block}
+  .topbar{
+    position:sticky;
+    top:0;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:saturate(180%) blur(8px);
+    border-bottom:1px solid var(--border);
+    z-index:20;
+    box-shadow:0 2px 8px -4px var(--ring);
+  }
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .spacer{flex:1}
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid var(--border);
+    padding:8px 16px;
+    border-radius:12px;
+    background:#fff;
+    cursor:pointer;
+    box-shadow:0 2px 8px -4px var(--ring);
+    white-space:nowrap;
+    transition:all 0.2s;
+    font-size:14px;
+  }
+  .btn:hover{background:#f8fafc;transform:translateY(-1px);box-shadow:0 4px 12px -4px var(--ring)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.primary:hover{background:#1d4ed8}
+  .btn.success{background:var(--success);color:#fff;border-color:var(--success)}
+  .btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+  .btn.ghost{border-color:transparent;background:transparent}
+  .btn.icon{width:36px;height:36px;justify-content:center;padding:0}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+  .card{
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:#fff;
+    box-shadow:0 4px 16px -8px var(--ring);
+    transition:box-shadow 0.2s;
+  }
+  .card:hover{box-shadow:0 8px 24px -8px var(--ring)}
+  .card .hd{padding:16px 16px 8px 16px;font-weight:600;font-size:15px;color:var(--fg)}
+  .card .bd{padding:12px 16px 16px 16px}
+  .grid{display:grid;gap:12px}
+  .grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media (max-width:980px){
+    .grid.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.cols-3{grid-template-columns:repeat(1,minmax(0,1fr))}
+  }
+  @media (max-width:640px){
+    .grid.cols-4{grid-template-columns:repeat(1,minmax(0,1fr))}
+  }
+  .label{font-size:12px;color:var(--muted-fg);margin-bottom:6px;display:block;font-weight:500}
+  .input,.select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    outline:none;
+    font-size:14px;
+    transition:all 0.2s;
+  }
+  .input:focus,.select:focus{
+    box-shadow:0 0 0 4px var(--ring);
+    border-color:var(--accent);
+  }
+  .input:invalid{border-color:var(--danger)}
+  .kpi{font-size:24px;font-weight:600;color:var(--fg)}
+  .kpi.positive{color:var(--success)}
+  .kpi.negative{color:var(--danger)}
+  .muted{color:var(--muted-fg)}
+  .sep{height:1px;background:var(--border);margin:8px 0}
+  table{width:100%;border-collapse:collapse}
+  thead th{
+    background:var(--muted);
+    text-align:left;
+    padding:12px;
+    border-bottom:2px solid var(--border);
+    font-weight:600;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  tbody td{padding:12px;border-bottom:1px solid var(--border);font-size:14px}
+  tbody tr:hover td{background:#fafafa}
+  tbody tr:last-child td{border-bottom:none}
+  .right{text-align:right}
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:4px 10px;
+    font-size:12px;
+    background:#fff;
+  }
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .pilltabs{
+    display:inline-flex;
+    border:1px solid var(--border);
+    padding:4px;
+    border-radius:12px;
+    background:#fff;
+  }
+  .pilltabs button{
+    border:0;
+    background:transparent;
+    padding:6px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+  }
+  .pilltabs button[data-active="true"]{background:var(--muted);font-weight:600}
+  .chart{width:100%;height:220px;border:1px solid var(--border);border-radius:12px;display:block;background:#fafafa}
+  dialog{
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:0;
+    max-width:600px;
+    width:90%;
+    box-shadow:0 20px 60px -12px rgba(0,0,0,0.25);
+  }
+  dialog::backdrop{background:rgba(0,0,0,0.5);backdrop-filter:blur(2px)}
+  .dlg-hd{
+    padding:20px 24px;
+    border-bottom:1px solid var(--border);
+    font-weight:600;
+    font-size:16px;
+  }
+  .dlg-bd{padding:24px}
+  .dlg-ft{
+    padding:16px 24px;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+  }
+  .toast{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 16px;
+    box-shadow:0 8px 24px -8px var(--ring);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    z-index:1000;
+    animation:slideIn 0.3s ease-out;
+    max-width:400px;
+  }
+  .toast.success{border-left:4px solid var(--success)}
+  .toast.error{border-left:4px solid var(--danger)}
+  .toast.info{border-left:4px solid var(--info)}
+  @keyframes slideIn{
+    from{transform:translateX(400px);opacity:0}
+    to{transform:translateX(0);opacity:1}
+  }
+  .progress-bar{
+    height:6px;
+    background:var(--muted);
+    border-radius:999px;
+    overflow:hidden;
+    margin-top:4px;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--accent);
+    transition:width 0.3s;
+    border-radius:999px;
+  }
+  .progress-fill.warning{background:var(--warning)}
+  .progress-fill.danger{background:var(--danger)}
+  .empty-state{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--muted-fg);
+  }
+  .empty-state svg{width:64px;height:64px;margin:0 auto 16px;opacity:0.3}
+  .filter-group{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .help-text{
+    font-size:12px;
+    color:var(--muted-fg);
+    margin-top:4px;
+  }
+  .stat-card{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .stat-label{
+    font-size:12px;
+    color:var(--muted-fg);
+    font-weight:500;
+  }
+  .stat-value{
+    font-size:20px;
+    font-weight:600;
+  }
 </style>
 </head>
 <body>
   <div class="topbar">
-    <div class="container row" style="padding:10px 16px">
+    <div class="container row" style="padding:12px 16px">
       <div class="row" style="gap:10px">
-        <strong>Financeiro Clean PRO</strong>
-        <select id="monthPicker" class="select" style="width:180px"></select>
-        <button class="btn icon" id="prevMonthBtn">◀</button>
-        <button class="btn icon" id="nextMonthBtn">▶</button>
+        <strong style="font-size:16px">💰 Financeiro Clean PRO</strong>
+        <select id="monthPicker" class="select" style="width:200px"></select>
+        <button class="btn icon" id="prevMonthBtn" title="Mês anterior">◀</button>
+        <button class="btn icon" id="nextMonthBtn" title="Próximo mês">▶</button>
       </div>
       <div class="spacer"></div>
       <label class="btn"><input type="file" id="importJSON" accept="application/json" hidden>📤 Importar</label>
       <button class="btn" id="exportBtn">📥 Exportar</button>
-      <button class="btn ghost icon" id="tagsBtn">🏷️</button>
-      <button class="btn ghost icon" id="resetBtn">♻️</button>
+      <button class="btn ghost icon" id="tagsBtn" title="Gerenciar tags">🏷️</button>
+      <button class="btn ghost icon" id="goalsBtn" title="Metas e objetivos">🎯</button>
+      <button class="btn ghost icon" id="resetBtn" title="Resetar dados">♻️</button>
     </div>
   </div>
 
-  <div class="container grid" style="margin-top:12px;gap:12px">
+  <div class="container grid" style="margin-top:16px;gap:16px">
+    <!-- KPIs -->
     <div class="grid cols-4">
-      <div class="card"><div class="hd">Pagamento</div><div class="bd kpi" id="kpiPayment">R$ 0,00</div></div>
-      <div class="card"><div class="hd">Benefícios</div><div class="bd kpi" id="kpiBenefits">R$ 0,00</div></div>
-      <div class="card"><div class="hd">Adicionais</div><div class="bd kpi" id="kpiAdditions">R$ 0,00</div></div>
-      <div class="card"><div class="hd">Orçamento confirmado</div><div class="bd kpi" id="kpiBudget">R$ 0,00</div></div>
+      <div class="card">
+        <div class="hd">Pagamento</div>
+        <div class="bd kpi" id="kpiPayment">R$ 0,00</div>
+      </div>
+      <div class="card">
+        <div class="hd">Benefícios</div>
+        <div class="bd kpi" id="kpiBenefits">R$ 0,00</div>
+      </div>
+      <div class="card">
+        <div class="hd">Adicionais</div>
+        <div class="bd kpi" id="kpiAdditions">R$ 0,00</div>
+      </div>
+      <div class="card">
+        <div class="hd">Orçamento confirmado</div>
+        <div class="bd kpi" id="kpiBudget">R$ 0,00</div>
+      </div>
     </div>
 
+    <!-- Formulários principais -->
     <div class="grid cols-3">
+      <!-- Receitas -->
       <div class="card">
         <div class="hd">Receitas do mês</div>
         <div class="bd grid">
-          <label class="label">Pagamento total</label><input id="inPay" class="input money" inputmode="decimal" placeholder="0,00">
-          <label class="label">Benefícios</label><input id="inBen" class="input money" inputmode="decimal" placeholder="0,00">
-          <label class="label">Adicionais</label><input id="inAdd" class="input money" inputmode="decimal" placeholder="0,00">
+          <label class="label">Pagamento total</label>
+          <input id="inPay" class="input money" inputmode="decimal" placeholder="0,00" type="text">
+          <label class="label">Benefícios</label>
+          <input id="inBen" class="input money" inputmode="decimal" placeholder="0,00" type="text">
+          <label class="label">Adicionais</label>
+          <input id="inAdd" class="input money" inputmode="decimal" placeholder="0,00" type="text">
           <div class="sep"></div>
-          <div class="row" style="justify-content:space-between"><span class="muted">Receita total (prévia)</span><strong id="inTotal">R$ 0,00</strong></div>
-          <div class="row" style="gap:8px"><button class="btn primary" id="confirmIncome">Confirmar receitas</button><button class="btn" id="clearIncome">Limpar</button></div>
-          <div class="muted" style="font-size:12px">Confirmar soma ao orçamento do mês. Pode confirmar várias vezes.</div>
+          <div class="row" style="justify-content:space-between;align-items:center">
+            <span class="muted">Receita total (prévia)</span>
+            <strong id="inTotal" style="font-size:18px">R$ 0,00</strong>
+          </div>
+          <div class="row" style="gap:8px">
+            <button class="btn primary" id="confirmIncome">✓ Confirmar receitas</button>
+            <button class="btn" id="clearIncome">Limpar</button>
+          </div>
+          <div class="help-text">Confirme para somar ao orçamento do mês. Você pode confirmar várias vezes.</div>
         </div>
       </div>
 
+      <!-- Lançar despesa -->
       <div class="card">
         <div class="hd">Lançar despesa</div>
         <div class="bd grid">
-          <label class="label">Descrição</label><input id="expDesc" class="input" placeholder="Ex.: Mercado, Uber, Aluguel">
+          <label class="label">Descrição</label>
+          <input id="expDesc" class="input" placeholder="Ex.: Mercado, Uber, Aluguel" maxlength="100">
           <div class="grid cols-2">
-            <div><label class="label">Valor</label><input id="expVal" class="input money" inputmode="decimal" placeholder="0,00"></div>
-            <div><label class="label">Data</label><input id="expDate" class="input" type="date"></div>
+            <div>
+              <label class="label">Valor</label>
+              <input id="expVal" class="input money" inputmode="decimal" placeholder="0,00" type="text" required>
+            </div>
+            <div>
+              <label class="label">Data</label>
+              <input id="expDate" class="input" type="date" required>
+            </div>
           </div>
-          <label class="label">Tag</label><select id="expTag" class="select"></select>
-          <div class="row"><button class="btn" id="expSubmit">Adicionar</button><button class="btn" id="expCancel" style="display:none">Cancelar</button></div>
+          <label class="label">Tag</label>
+          <select id="expTag" class="select"></select>
+          <div class="row" style="gap:8px">
+            <button class="btn primary" id="expSubmit">+ Adicionar</button>
+            <button class="btn" id="expCancel" style="display:none">Cancelar</button>
+          </div>
         </div>
       </div>
 
+      <!-- Resumo -->
       <div class="card">
-        <div class="hd">Resumo</div>
+        <div class="hd">Resumo do mês</div>
         <div class="bd grid">
-          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="countInvest" checked>Contar investimentos como despesa</label>
-          <div class="row" style="justify-content:space-between"><span>Despesas filtradas</span><strong id="sumFiltered">R$ 0,00</strong></div>
-          <div class="row" style="justify-content:space-between"><span>Total investido (filtro)</span><strong id="sumInvest">R$ 0,00</strong></div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="countInvest" checked>
+            <span>Contar investimentos como despesa</span>
+          </label>
           <div class="sep"></div>
-          <div class="row" style="justify-content:space-between"><span>Orçamento do mês</span><strong id="sumBudget">R$ 0,00</strong></div>
-          <div class="row" style="justify-content:space-between"><span>Saldo do mês</span><strong id="sumSaldo">R$ 0,00</strong></div>
-          <div class="row" style="justify-content:space-between"><span>Taxa de poupança</span><strong id="sumRate">0,0%</strong></div>
-          <div class="row" style="justify-content:space-between"><span>Restante do orçamento</span><strong id="sumRestante">R$ 0,00</strong></div>
+          <div class="stat-card">
+            <div class="row" style="justify-content:space-between">
+              <span class="stat-label">Despesas filtradas</span>
+              <strong class="stat-value" id="sumFiltered">R$ 0,00</strong>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="row" style="justify-content:space-between">
+              <span class="stat-label">Total investido</span>
+              <strong class="stat-value" id="sumInvest">R$ 0,00</strong>
+            </div>
+          </div>
+          <div class="sep"></div>
+          <div class="stat-card">
+            <div class="row" style="justify-content:space-between">
+              <span class="stat-label">Orçamento do mês</span>
+              <strong class="stat-value" id="sumBudget">R$ 0,00</strong>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="row" style="justify-content:space-between">
+              <span class="stat-label">Saldo do mês</span>
+              <strong class="stat-value" id="sumSaldo">R$ 0,00</strong>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="row" style="justify-content:space-between">
+              <span class="stat-label">Taxa de poupança</span>
+              <strong class="stat-value" id="sumRate">0,0%</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="rateProgress" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="row" style="justify-content:space-between">
+              <span class="stat-label">Restante do orçamento</span>
+              <strong class="stat-value" id="sumRestante">R$ 0,00</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="budgetProgress" style="width:0%"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Despesas -->
     <div class="card">
-      <div class="hd row" style="justify-content:space-between">
-        <div>Despesas</div>
-        <div class="row"><span class="muted" style="font-size:12px;margin-right:6px">Filtrar:</span><select id="filterTag" class="select" style="width:160px"></select><input id="search" class="input" placeholder="Buscar descrição..." style="margin-left:8px;width:220px"></div>
+      <div class="hd row" style="justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="font-size:16px">💸 Despesas</div>
+        <div class="filter-group">
+          <span class="muted" style="font-size:12px">Filtrar:</span>
+          <select id="filterTag" class="select" style="width:160px"></select>
+          <input id="filterDateFrom" class="input" type="date" placeholder="Data inicial" style="width:140px" title="Filtrar a partir desta data">
+          <input id="filterDateTo" class="input" type="date" placeholder="Data final" style="width:140px" title="Filtrar até esta data">
+          <input id="search" class="input" placeholder="🔍 Buscar descrição..." style="width:220px">
+          <button class="btn ghost icon" id="clearFilters" title="Limpar filtros">✕</button>
+        </div>
       </div>
       <div class="bd">
         <div style="overflow:auto;border:1px solid var(--border);border-radius:12px">
-          <table><thead><tr><th>Data</th><th>Descrição</th><th>Tag</th><th class="right">Valor</th><th></th></tr></thead><tbody id="expTable"></tbody></table>
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Tag</th>
+                <th class="right">Valor</th>
+                <th style="width:100px"></th>
+              </tr>
+            </thead>
+            <tbody id="expTable"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
+    <!-- Investimentos -->
     <div class="card">
-      <div class="hd">Investimentos</div>
+      <div class="hd">📈 Investimentos</div>
       <div class="bd grid">
         <div class="grid cols-3">
-          <div><label class="label">Ativo / Descrição</label><input id="invDesc" class="input" placeholder="Ex.: Tesouro Selic 2029, PETR4, BTC"></div>
-          <div><label class="label">Categoria</label><select id="invCat" class="select"><option>Renda Fixa</option><option>Ações</option><option>Fundos</option><option>Cripto</option><option>Poupança</option><option>Outros</option></select></div>
-          <div class="grid cols-2"><div><label class="label">Valor</label><input id="invVal" class="input money" inputmode="decimal" placeholder="0,00"></div><div><label class="label">Data</label><input id="invDate" class="input" type="date"></div></div>
+          <div>
+            <label class="label">Ativo / Descrição</label>
+            <input id="invDesc" class="input" placeholder="Ex.: Tesouro Selic 2029, PETR4, BTC" maxlength="100">
+          </div>
+          <div>
+            <label class="label">Categoria</label>
+            <select id="invCat" class="select">
+              <option>Renda Fixa</option>
+              <option>Ações</option>
+              <option>Fundos</option>
+              <option>Cripto</option>
+              <option>Poupança</option>
+              <option>Outros</option>
+            </select>
+          </div>
+          <div class="grid cols-2">
+            <div>
+              <label class="label">Valor</label>
+              <input id="invVal" class="input money" inputmode="decimal" placeholder="0,00" type="text" required>
+            </div>
+            <div>
+              <label class="label">Data</label>
+              <input id="invDate" class="input" type="date" required>
+            </div>
+          </div>
         </div>
         <div class="grid cols-2">
-          <div><label class="label">Corretora/Conta</label><input id="invBroker" class="input" placeholder="Ex.: Nubank, XP, Binance"></div>
-          <div style="display:flex;align-items:flex-end;gap:8px"><button class="btn" id="invSubmit">Adicionar</button><button class="btn" id="invCancel" style="display:none">Cancelar</button></div>
+          <div>
+            <label class="label">Corretora/Conta</label>
+            <input id="invBroker" class="input" placeholder="Ex.: Nubank, XP, Binance" maxlength="50">
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:8px">
+            <button class="btn primary" id="invSubmit">+ Adicionar</button>
+            <button class="btn" id="invCancel" style="display:none">Cancelar</button>
+          </div>
         </div>
 
-        <div class="row" style="justify-content:space-between">
-          <div class="row" style="gap:8px"><span class="muted" style="font-size:12px">Filtrar:</span>
-            <select id="filterCat" class="select" style="width:180px"><option value="all">Todas as categorias</option><option>Renda Fixa</option><option>Ações</option><option>Fundos</option><option>Cripto</option><option>Poupança</option><option>Outros</option></select>
-            <input id="searchInv" class="input" placeholder="Buscar por ativo/corretora..." style="width:220px">
+        <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div class="filter-group">
+            <span class="muted" style="font-size:12px">Filtrar:</span>
+            <select id="filterCat" class="select" style="width:180px">
+              <option value="all">Todas as categorias</option>
+              <option>Renda Fixa</option>
+              <option>Ações</option>
+              <option>Fundos</option>
+              <option>Cripto</option>
+              <option>Poupança</option>
+              <option>Outros</option>
+            </select>
+            <input id="searchInv" class="input" placeholder="🔍 Buscar ativo/corretora..." style="width:220px">
           </div>
         </div>
 
         <div style="overflow:auto;border:1px solid var(--border);border-radius:12px">
-          <table><thead><tr><th>Data</th><th>Ativo</th><th>Categoria</th><th>Corretora</th><th class="right">Valor</th><th></th></tr></thead><tbody id="invTable"></tbody></table>
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Ativo</th>
+                <th>Categoria</th>
+                <th>Corretora</th>
+                <th class="right">Valor</th>
+                <th style="width:100px"></th>
+              </tr>
+            </thead>
+            <tbody id="invTable"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
+    <!-- Gráficos -->
     <div class="grid cols-3">
-      <div class="card"><div class="hd">Gráfico: Orçamento × Despesas × Investimentos</div><div class="bd"><svg id="chartBars" class="chart" viewBox="0 0 600 220"></svg></div></div>
-      <div class="card"><div class="hd">Despesas por Tag (pizza)</div><div class="bd"><svg id="chartPie" class="chart" viewBox="0 0 220 220"></svg></div></div>
-      <div class="card"><div class="hd">Investimentos por Categoria (pizza)</div><div class="bd"><svg id="chartPieInv" class="chart" viewBox="0 0 220 220"></svg></div></div>
+      <div class="card">
+        <div class="hd">Gráfico: Orçamento × Despesas × Investimentos</div>
+        <div class="bd">
+          <svg id="chartBars" class="chart" viewBox="0 0 600 220"></svg>
+        </div>
+      </div>
+      <div class="card">
+        <div class="hd">Despesas por Tag (pizza)</div>
+        <div class="bd">
+          <svg id="chartPie" class="chart" viewBox="0 0 220 220"></svg>
+        </div>
+      </div>
+      <div class="card">
+        <div class="hd">Investimentos por Categoria (pizza)</div>
+        <div class="bd">
+          <svg id="chartPieInv" class="chart" viewBox="0 0 220 220"></svg>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Dialog Tags -->
   <dialog id="dlgTags">
-    <div class="dlg-hd">Administração de Tags</div>
+    <div class="dlg-hd">🏷️ Administração de Tags</div>
     <div class="dlg-bd grid">
       <div class="grid cols-3">
-        <div class="grid" style="gap:6px"><label class="label">Nome</label><input id="tagName" class="input" placeholder="Ex.: Mercado, Transporte..."></div>
-        <div class="grid" style="gap:6px"><label class="label">Cor</label><input id="tagColor" class="input" type="color" value="#2563eb"></div>
-        <div class="grid" style="gap:6px;align-content:end"><button class="btn" id="tagSave">Salvar/Adicionar</button></div>
+        <div class="grid" style="gap:6px">
+          <label class="label">Nome</label>
+          <input id="tagName" class="input" placeholder="Ex.: Mercado, Transporte..." maxlength="30">
+        </div>
+        <div class="grid" style="gap:6px">
+          <label class="label">Cor</label>
+          <input id="tagColor" class="input" type="color" value="#2563eb">
+        </div>
+        <div class="grid" style="gap:6px;align-content:end">
+          <button class="btn primary" id="tagSave">Salvar/Adicionar</button>
+        </div>
       </div>
       <div class="sep"></div>
-      <div style="overflow:auto;border:1px solid var(--border);border-radius:12px">
-        <table><thead><tr><th>Tag</th><th>Cor</th><th></th></tr></thead><tbody id="tagTable"></tbody></table>
+      <div style="overflow:auto;border:1px solid var(--border);border-radius:12px;max-height:400px">
+        <table>
+          <thead>
+            <tr>
+              <th>Tag</th>
+              <th>Cor</th>
+              <th style="width:120px"></th>
+            </tr>
+          </thead>
+          <tbody id="tagTable"></tbody>
+        </table>
       </div>
     </div>
-    <div class="dlg-ft"><button class="btn" onclick="document.getElementById('dlgTags').close()">Fechar</button></div>
+    <div class="dlg-ft">
+      <button class="btn" onclick="document.getElementById('dlgTags').close()">Fechar</button>
+    </div>
+  </dialog>
+
+  <!-- Dialog Metas -->
+  <dialog id="dlgGoals">
+    <div class="dlg-hd">🎯 Metas e Objetivos</div>
+    <div class="dlg-bd grid">
+      <div class="grid cols-3">
+        <div class="grid" style="gap:6px">
+          <label class="label">Tipo</label>
+          <select id="goalType" class="select">
+            <option value="expense">Meta de Gastos (por Tag)</option>
+            <option value="investment">Meta de Investimentos</option>
+            <option value="savings">Meta de Poupança</option>
+          </select>
+        </div>
+        <div class="grid" style="gap:6px">
+          <label class="label" id="goalLabel">Tag</label>
+          <select id="goalTag" class="select"></select>
+          <input id="goalDesc" class="input" placeholder="Descrição da meta" style="display:none" maxlength="50">
+        </div>
+        <div class="grid cols-2">
+          <div>
+            <label class="label">Valor da meta</label>
+            <input id="goalAmount" class="input money" inputmode="decimal" placeholder="0,00" type="text">
+          </div>
+          <div>
+            <label class="label">Período</label>
+            <select id="goalPeriod" class="select">
+              <option value="month">Mensal</option>
+              <option value="year">Anual</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div style="overflow:auto;border:1px solid var(--border);border-radius:12px;max-height:400px">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Descrição</th>
+              <th class="right">Meta</th>
+              <th class="right">Atual</th>
+              <th class="right">Progresso</th>
+              <th style="width:100px"></th>
+            </tr>
+          </thead>
+          <tbody id="goalTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn primary" id="goalSave">Salvar Meta</button>
+      <button class="btn" onclick="document.getElementById('dlgGoals').close()">Fechar</button>
+    </div>
   </dialog>
 
 <script>
 (function(){
-  const LS_KEY="financeiro_clean_pro_v1";
-  const $=(s)=>document.querySelector(s); const $$=(s)=>Array.from(document.querySelectorAll(s));
-  const defaults=()=>{const now=new Date();const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;function uid(){return Math.random().toString(36).slice(2,10)}return{tags:[{id:uid(),name:"Alimentação",color:"#16a34a"},{id:uid(),name:"Transporte",color:"#2563eb"},{id:uid(),name:"Moradia",color:"#ea580c"},{id:uid(),name:"Contas",color:"#9333ea"},{id:uid(),name:"Lazer",color:"#e11d48"}],months:{[ym]:{incomeDraft:{payment:0,benefits:0,additions:0},incomeCommitted:0,expenses:[],investments:[]}},countInvestAsExpense:true};};
-  function load(){try{return JSON.parse(localStorage.getItem(LS_KEY))||defaults();}catch{return defaults();}}
-  function save(){localStorage.setItem(LS_KEY,JSON.stringify(store));}
-  const toNumberBR=(s)=>{if(typeof s!=='string')s=String(s??'');s=s.replace(/\./g,'').replace(',', '.');const n=parseFloat(s);return isNaN(n)?0:n;};
-  const fmt=(n)=>(Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-  const fmt2=(n)=>(Number(n)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  let store=load(); let month=Object.keys(store.months)[0];
-  let editingExpId=null, editingTagId=null, editingInvId=null;
-  const monthPicker=$("#monthPicker"), prevMonthBtn=$("#prevMonthBtn"), nextMonthBtn=$("#nextMonthBtn");
-  const inPay=$("#inPay"), inBen=$("#inBen"), inAdd=$("#inAdd"), inTotal=$("#inTotal"), confirmIncome=$("#confirmIncome"), clearIncome=$("#clearIncome");
-  const kpiPayment=$("#kpiPayment"), kpiBenefits=$("#kpiBenefits"), kpiAdditions=$("#kpiAdditions"), kpiBudget=$("#kpiBudget");
-  const expDesc=$("#expDesc"), expVal=$("#expVal"), expDate=$("#expDate"), expTag=$("#expTag"), expSubmit=$("#expSubmit"), expCancel=$("#expCancel"), filterTag=$("#filterTag"), search=$("#search"), expTable=$("#expTable");
-  const invDesc=$("#invDesc"), invCat=$("#invCat"), invVal=$("#invVal"), invDate=$("#invDate"), invBroker=$("#invBroker"), invSubmit=$("#invSubmit"), invCancel=$("#invCancel"), filterCat=$("#filterCat"), searchInv=$("#searchInv"), invTable=$("#invTable");
-  const countInvest=$("#countInvest"), sumFiltered=$("#sumFiltered"), sumInvest=$("#sumInvest"), sumBudget=$("#sumBudget"), sumSaldo=$("#sumSaldo"), sumRate=$("#sumRate"), sumRestante=$("#sumRestante");
-  const exportBtn=$("#exportBtn"), importJSON=$("#importJSON"), tagsBtn=$("#tagsBtn"), resetBtn=$("#resetBtn");
-  const dlgTags=$("#dlgTags"), tagName=$("#tagName"), tagColor=$("#tagColor"), tagSave=$("#tagSave"), tagTable=$("#tagTable");
-
-  function ensureMonth(ym){if(!store.months[ym]) store.months[ym]={incomeDraft:{payment:0,benefits:0,additions:0},incomeCommitted:0,expenses:[],investments:[]};}
-  function current(){return store.months[month]}
-  function uid(){return Math.random().toString(36).slice(2,10)}
-
-  function renderMonths(){const list=Object.keys(store.months); if(!list.includes(month)) list.push(month); list.sort(); monthPicker.innerHTML=list.map(ym=>`<option value="${ym}">${new Date(ym+'-01').toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</option>`).join(''); monthPicker.value=month;}
-  function addMonth(delta){const [y,m]=month.split('-').map(Number); const d=new Date(y,m-1+delta,1); const ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; ensureMonth(ym); month=ym; save(); refresh(true);}
-
-  function renderIncome(sync){const d=current().incomeDraft; const total=Number(d.payment)+Number(d.benefits)+Number(d.additions); if(sync){inPay.value=fmt2(d.payment); inBen.value=fmt2(d.benefits); inAdd.value=fmt2(d.additions);} inTotal.textContent=fmt(total); kpiPayment.textContent=fmt(d.payment); kpiBenefits.textContent=fmt(d.benefits); kpiAdditions.textContent=fmt(d.additions); kpiBudget.textContent=fmt(current().incomeCommitted); sumBudget.textContent=fmt(current().incomeCommitted);}
-
-  function renderTags(){const opts=store.tags.map(t=>`<option value="${t.id}">${t.name}</option>`).join(''); expTag.innerHTML=opts; filterTag.innerHTML=`<option value="all">Todas as tags</option>`+opts;}
-
-  function renderExpenses(){const q=(search.value||'').trim().toLowerCase(); const tag=filterTag.value; const items=current().expenses.filter(e=>tag==='all'?true:e.tagId===tag).filter(e=>q? (e.description||'').toLowerCase().includes(q):true).sort((a,b)=>new Date(b.date)-new Date(a.date)); expTable.innerHTML=items.map(e=>{const t=store.tags.find(x=>x.id===e.tagId); const tagHtml=t?`<span class="badge"><span class="dot" style="background:${t.color}"></span>${t.name}</span>`:'<span class="muted">Sem tag</span>'; return `<tr><td>${new Date(e.date).toLocaleDateString('pt-BR')}</td><td>${esc(e.description||'')}</td><td>${tagHtml}</td><td class="right"><strong>${fmt(e.amount)}</strong></td><td class="right"><button class="btn ghost" data-edit="${e.id}">✏️</button><button class="btn ghost" data-del="${e.id}">🗑️</button></td></tr>`}).join(''); 
-    expTable.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-edit');const e=current().expenses.find(x=>x.id===id); if(!e) return; editingExpId=id; expDesc.value=e.description; expVal.value=fmt2(e.amount); expDate.value=e.date; expTag.value=e.tagId||""; expSubmit.textContent="Salvar edição"; expCancel.style.display="inline-flex"; window.scrollTo({top:0,behavior:'smooth'})}));
-    expTable.querySelectorAll("[data-del]").forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-del'); current().expenses=current().expenses.filter(x=>x.id!==id); save(); refresh(false);}));
-    const total=items.reduce((s,e)=>s+Number(e.amount||0),0); sumFiltered.textContent=fmt(total); return total;}
-
-  function renderInvestments(){const q=(searchInv.value||'').trim().toLowerCase(); const cat=filterCat.value; const items=current().investments.filter(i=>cat==='all'?true:i.category===cat).filter(i=>q? ((i.description||'').toLowerCase().includes(q)||(i.broker||'').toLowerCase().includes(q)):true).sort((a,b)=>new Date(b.date)-new Date(a.date)); invTable.innerHTML=items.map(i=>`<tr><td>${new Date(i.date).toLocaleDateString('pt-BR')}</td><td>${esc(i.description||'')}</td><td>${esc(i.category||'')}</td><td>${esc(i.broker||'')}</td><td class="right"><strong>${fmt(i.amount)}</strong></td><td class="right"><button class="btn ghost" data-iedit="${i.id}">✏️</button><button class="btn ghost" data-idel="${i.id}">🗑️</button></td></tr>`).join('')||`<tr><td colspan="6" class="muted" style="text-align:center;padding:18px">Sem investimentos lançados.</td></tr>`;
-    invTable.querySelectorAll("[data-iedit]").forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-iedit');const i=current().investments.find(x=>x.id===id); if(!i) return; editingInvId=id; invDesc.value=i.description; invCat.value=i.category; invVal.value=fmt2(i.amount); invDate.value=i.date; invBroker.value=i.broker||""; invSubmit.textContent="Salvar edição"; invCancel.style.display="inline-flex"; window.scrollTo({top:0,behavior:'smooth'})}));
-    invTable.querySelectorAll("[data-idel]").forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-idel'); current().investments=current().investments.filter(x=>x.id!==id); save(); refresh(false);}));
-    const total=items.reduce((s,i)=>s+Number(i.amount||0),0); sumInvest.textContent=fmt(total); return total;}
-
-  function charts(){const bars=$("#chartBars"); while(bars.firstChild) bars.removeChild(bars.firstChild); const W=600,H=220,pad=36,innerW=W-pad*2,innerH=H-pad*2;
-    const budget=current().incomeCommitted; const exp=num(sumFiltered.textContent); const inv=num(sumInvest.textContent); const maxv=Math.max(1,budget,exp,inv);
-    const x0=document.createElementNS("http://www.w3.org/2000/svg","line"); x0.setAttribute("x1",pad); x0.setAttribute("y1",H-pad); x0.setAttribute("x2",W-pad); x0.setAttribute("y2",H-pad); x0.setAttribute("stroke","#cbd5e1"); bars.appendChild(x0);
-    const labels=["Orçamento","Despesas","Invest."], vals=[budget,exp,inv], barW=innerW/labels.length*0.5;
-    labels.forEach((lb,i)=>{const x=pad+innerW/labels.length*(i+0.5); const h=(vals[i]/maxv)*(innerH-10); const y=H-pad-h;
-      const r=document.createElementNS(bars.namespaceURI,"rect"); r.setAttribute("x",x-barW/2); r.setAttribute("y",y); r.setAttribute("width",barW); r.setAttribute("height",h); r.setAttribute("fill","#2563eb"); bars.appendChild(r);
-      const t=document.createElementNS(bars.namespaceURI,"text"); t.setAttribute("x",x); t.setAttribute("y",H-pad+16); t.setAttribute("text-anchor","middle"); t.setAttribute("font-size","12"); t.textContent=lb; bars.appendChild(t);
-      const v=document.createElementNS(bars.namespaceURI,"text"); v.setAttribute("x",x); v.setAttribute("y",y-6); v.setAttribute("text-anchor","middle"); v.setAttribute("font-size","12"); v.textContent=fmt(vals[i]); bars.appendChild(v); });
-    function pie(svgId, entries){const svg=$(svgId); while(svg.firstChild) svg.removeChild(svg.firstChild); const total=entries.reduce((s,[_,v])=>s+v,0); const cx=110,cy=110,r=80; let a0=-Math.PI/2;
-      if(!total){const c=document.createElementNS(svg.namespaceURI,"circle"); c.setAttribute("cx",cx); c.setAttribute("cy",cy); c.setAttribute("r",r); c.setAttribute("fill","none"); c.setAttribute("stroke","#e2e8f0"); c.setAttribute("stroke-width","18"); svg.appendChild(c); return;}
-      const colors=["#2563eb","#16a34a","#9333ea","#ea580c","#e11d48","#0ea5e9","#a3e635","#f59e0b","#14b8a6"];
-      entries.forEach(([label,val],i)=>{const a1=a0+(val/total)*Math.PI*2; const x0=cx+r*Math.cos(a0), y0=cy+r*Math.sin(a0); const x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1); const large=(a1-a0)>Math.PI?1:0;
-        const p=document.createElementNS(svg.namespaceURI,"path"); p.setAttribute("d",`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`); p.setAttribute("fill",colors[i%colors.length]); svg.appendChild(p); a0=a1;});}
-    const tagTotals={}; (current().expenses||[]).forEach(e=>{const key=e.tagId||'Sem tag'; tagTotals[key]=(tagTotals[key]||0)+Number(e.amount||0)});
-    const entries=Object.entries(tagTotals).map(([id,total])=>{const t=store.tags.find(tt=>tt.id===id); return [t? t.name:'Sem tag', total]}).sort((a,b)=>b[1]-a[1]).slice(0,8);
-    pie("#chartPie", entries);
-    const catTotals={}; (current().investments||[]).forEach(i=>{const c=i.category||'Outros'; catTotals[c]=(catTotals[c]||0)+Number(i.amount||0)});
-    const entries2=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,8); pie("#chartPieInv", entries2);
+  'use strict';
+  
+  // ========== CONFIGURAÇÃO ==========
+  const LS_KEY = "financeiro_clean_pro_v2";
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  
+  // ========== UTILITÁRIOS ==========
+  function uid() {
+    return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   }
-  function num(s){const x=String(s).replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',', '.'); const n=parseFloat(x); return isNaN(n)?0:n;}
-  function esc(s){return (s||'').replace(/[&<>'"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c] || c;});}
-
-  function refresh(sync){ensureMonth(month); renderMonths(); renderIncome(!!sync); renderTags(); const e=renderExpenses(); const i=renderInvestments(); const budget=current().incomeCommitted; const spend=e + (store.countInvestAsExpense? i:0); const saldo=budget-spend; const rate=budget>0?(saldo/budget)*100:0; sumSaldo.textContent=fmt(saldo); sumRate.textContent=rate.toFixed(1)+'%'; sumRestante.textContent=fmt(saldo); charts();}
-
-  monthPicker.addEventListener('change',e=>{month=e.target.value; save(); refresh(true)}); prevMonthBtn.addEventListener('click',()=>addMonth(-1)); nextMonthBtn.addEventListener('click',()=>addMonth(1));
-  const moneyInputs=[inPay,inBen,inAdd,expVal,invVal]; moneyInputs.forEach(el=>{el.addEventListener('input',()=>{let v=el.value.replace(/[^\d.,]/g,''); v=v.replace(/\./g,','); el.value=v; const d=current().incomeDraft; if(el===inPay) d.payment=toNumberBR(v); if(el===inBen) d.benefits=toNumberBR(v); if(el===inAdd) d.additions=toNumberBR(v); save(); renderIncome(false);}); el.addEventListener('blur',()=>{el.value=fmt2(toNumberBR(el.value));});});
-  confirmIncome.addEventListener('click',()=>{const d=current().incomeDraft; const total=Number(d.payment)+Number(d.benefits)+Number(d.additions); current().incomeCommitted+=total; d.payment=0; d.benefits=0; d.additions=0; save(); refresh(true)});
-  clearIncome.addEventListener('click',()=>{const d=current().incomeDraft; d.payment=d.benefits=d.additions=0; save(); refresh(true)});
-  expDate.value=new Date().toISOString().slice(0,10); expSubmit.addEventListener('click',()=>{const e={id:editingExpId||uid(),description:(expDesc.value||'').trim()||'(sem descrição)',amount:toNumberBR(expVal.value),date:expDate.value,tagId:expTag.value||null}; if(editingExpId){const ix=current().expenses.findIndex(x=>x.id===editingExpId); if(ix>=0) current().expenses[ix]=e;} else{current().expenses.unshift(e);} editingExpId=null; expDesc.value=''; expVal.value=''; expDate.value=new Date().toISOString().slice(0,10); expTag.value=store.tags[0]?.id||''; expSubmit.textContent='Adicionar'; expCancel.style.display='none'; save(); refresh(false)});
-  expCancel.addEventListener('click',()=>{editingExpId=null; expSubmit.textContent='Adicionar'; expCancel.style.display='none'; expDesc.value=''; expVal.value=''; expDate.value=new Date().toISOString().slice(0,10); expTag.value=store.tags[0]?.id||'';});
-  filterTag.addEventListener('change',()=>refresh(false)); search.addEventListener('input',()=>refresh(false));
-  invDate.value=new Date().toISOString().slice(0,10); invSubmit.addEventListener('click',()=>{const i={id:editingInvId||uid(),description:(invDesc.value||'').trim()||'(sem descrição)',category:invCat.value||'Outros',amount:toNumberBR(invVal.value),date:invDate.value,broker:(invBroker.value||'').trim()}; if(editingInvId){const ix=current().investments.findIndex(x=>x.id===editingInvId); if(ix>=0) current().investments[ix]=i;} else{current().investments.unshift(i);} editingInvId=null; invDesc.value=''; invVal.value=''; invDate.value=new Date().toISOString().slice(0,10); invBroker.value=''; invSubmit.textContent='Adicionar'; invCancel.style.display='none'; save(); refresh(false)});
-  invCancel.addEventListener('click',()=>{editingInvId=null; invSubmit.textContent='Adicionar'; invCancel.style.display='none'; invDesc.value=''; invVal.value=''; invDate.value=new Date().toISOString().slice(0,10); invBroker.value='';});
-  filterCat.addEventListener('change',()=>refresh(false)); searchInv.addEventListener('input',()=>refresh(false)); countInvest.addEventListener('change',()=>{store.countInvestAsExpense=countInvest.checked; save(); refresh(false)});
-
+  
+  function toNumberBR(s) {
+    if (typeof s !== 'string') s = String(s ?? '');
+    s = s.replace(/\./g, '').replace(',', '.');
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+  
+  function fmt(n) {
+    return (Number(n) || 0).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  }
+  
+  function fmt2(n) {
+    return (Number(n) || 0).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+  
+  function esc(s) {
+    return (s || '').replace(/[&<>'"]/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c] || c;
+    });
+  }
+  
+  // CORREÇÃO DO BUG DAS DATAS: Parse local sem problemas de timezone
+  function parseLocalDate(dateStr) {
+    if (!dateStr) return new Date();
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  
+  function formatDateBR(dateStr) {
+    if (!dateStr) return '';
+    const date = parseLocalDate(dateStr);
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+  
+  function getTodayStr() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  
+  function num(s) {
+    const x = String(s).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+    const n = parseFloat(x);
+    return isNaN(n) ? 0 : n;
+  }
+  
+  function toast(message, type = 'info') {
+    const toastEl = document.createElement('div');
+    toastEl.className = `toast ${type}`;
+    toastEl.textContent = message;
+    document.body.appendChild(toastEl);
+    setTimeout(() => {
+      toastEl.style.animation = 'slideIn 0.3s ease-out reverse';
+      setTimeout(() => toastEl.remove(), 300);
+    }, 3000);
+  }
+  
+  // ========== DADOS ==========
+  function defaults() {
+    const now = new Date();
+    const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return {
+      tags: [
+        {id: uid(), name: "Alimentação", color: "#16a34a"},
+        {id: uid(), name: "Transporte", color: "#2563eb"},
+        {id: uid(), name: "Moradia", color: "#ea580c"},
+        {id: uid(), name: "Contas", color: "#9333ea"},
+        {id: uid(), name: "Lazer", color: "#e11d48"}
+      ],
+      months: {
+        [ym]: {
+          incomeDraft: {payment: 0, benefits: 0, additions: 0},
+          incomeCommitted: 0,
+          expenses: [],
+          investments: []
+        }
+      },
+      goals: [],
+      countInvestAsExpense: true
+    };
+  }
+  
+  function load() {
+    try {
+      const data = JSON.parse(localStorage.getItem(LS_KEY));
+      if (!data) return defaults();
+      // Migração de v1 para v2
+      if (!data.goals) data.goals = [];
+      return data;
+    } catch (e) {
+      console.error('Erro ao carregar dados:', e);
+      return defaults();
+    }
+  }
+  
+  function save() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(store));
+    } catch (e) {
+      console.error('Erro ao salvar:', e);
+      toast('Erro ao salvar dados. Verifique o espaço disponível.', 'error');
+    }
+  }
+  
+  let store = load();
+  let month = Object.keys(store.months).sort().pop() || Object.keys(store.months)[0];
+  let editingExpId = null;
+  let editingTagId = null;
+  let editingInvId = null;
+  let editingGoalId = null;
+  
+  // ========== ELEMENTOS DO DOM ==========
+  const monthPicker = $("#monthPicker");
+  const prevMonthBtn = $("#prevMonthBtn");
+  const nextMonthBtn = $("#nextMonthBtn");
+  const inPay = $("#inPay");
+  const inBen = $("#inBen");
+  const inAdd = $("#inAdd");
+  const inTotal = $("#inTotal");
+  const confirmIncome = $("#confirmIncome");
+  const clearIncome = $("#clearIncome");
+  const kpiPayment = $("#kpiPayment");
+  const kpiBenefits = $("#kpiBenefits");
+  const kpiAdditions = $("#kpiAdditions");
+  const kpiBudget = $("#kpiBudget");
+  const expDesc = $("#expDesc");
+  const expVal = $("#expVal");
+  const expDate = $("#expDate");
+  const expTag = $("#expTag");
+  const expSubmit = $("#expSubmit");
+  const expCancel = $("#expCancel");
+  const filterTag = $("#filterTag");
+  const filterDateFrom = $("#filterDateFrom");
+  const filterDateTo = $("#filterDateTo");
+  const search = $("#search");
+  const clearFilters = $("#clearFilters");
+  const expTable = $("#expTable");
+  const invDesc = $("#invDesc");
+  const invCat = $("#invCat");
+  const invVal = $("#invVal");
+  const invDate = $("#invDate");
+  const invBroker = $("#invBroker");
+  const invSubmit = $("#invSubmit");
+  const invCancel = $("#invCancel");
+  const filterCat = $("#filterCat");
+  const searchInv = $("#searchInv");
+  const invTable = $("#invTable");
+  const countInvest = $("#countInvest");
+  const sumFiltered = $("#sumFiltered");
+  const sumInvest = $("#sumInvest");
+  const sumBudget = $("#sumBudget");
+  const sumSaldo = $("#sumSaldo");
+  const sumRate = $("#sumRate");
+  const sumRestante = $("#sumRestante");
+  const rateProgress = $("#rateProgress");
+  const budgetProgress = $("#budgetProgress");
+  const exportBtn = $("#exportBtn");
+  const importJSON = $("#importJSON");
+  const tagsBtn = $("#tagsBtn");
+  const goalsBtn = $("#goalsBtn");
+  const resetBtn = $("#resetBtn");
+  const dlgTags = $("#dlgTags");
+  const tagName = $("#tagName");
+  const tagColor = $("#tagColor");
+  const tagSave = $("#tagSave");
+  const tagTable = $("#tagTable");
+  const dlgGoals = $("#dlgGoals");
+  const goalType = $("#goalType");
+  const goalLabel = $("#goalLabel");
+  const goalTag = $("#goalTag");
+  const goalDesc = $("#goalDesc");
+  const goalAmount = $("#goalAmount");
+  const goalPeriod = $("#goalPeriod");
+  const goalSave = $("#goalSave");
+  const goalTable = $("#goalTable");
+  
+  // ========== FUNÇÕES DE ESTADO ==========
+  function ensureMonth(ym) {
+    if (!store.months[ym]) {
+      store.months[ym] = {
+        incomeDraft: {payment: 0, benefits: 0, additions: 0},
+        incomeCommitted: 0,
+        expenses: [],
+        investments: []
+      };
+    }
+  }
+  
+  function current() {
+    ensureMonth(month);
+    return store.months[month];
+  }
+  
+  // ========== RENDERIZAÇÃO ==========
+  function renderMonths() {
+    const list = Object.keys(store.months);
+    if (!list.includes(month)) list.push(month);
+    list.sort();
+    monthPicker.innerHTML = list.map(ym => {
+      const [y, m] = ym.split('-').map(Number);
+      const date = new Date(y, m - 1, 1);
+      return `<option value="${ym}">${date.toLocaleDateString('pt-BR', {month: 'long', year: 'numeric'})}</option>`;
+    }).join('');
+    monthPicker.value = month;
+  }
+  
+  function addMonth(delta) {
+    const [y, m] = month.split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    ensureMonth(ym);
+    month = ym;
+    save();
+    refresh(true);
+  }
+  
+  function renderIncome(sync) {
+    const d = current().incomeDraft;
+    const total = Number(d.payment) + Number(d.benefits) + Number(d.additions);
+    if (sync) {
+      inPay.value = fmt2(d.payment);
+      inBen.value = fmt2(d.benefits);
+      inAdd.value = fmt2(d.additions);
+    }
+    inTotal.textContent = fmt(total);
+    kpiPayment.textContent = fmt(d.payment);
+    kpiBenefits.textContent = fmt(d.benefits);
+    kpiAdditions.textContent = fmt(d.additions);
+    kpiBudget.textContent = fmt(current().incomeCommitted);
+    sumBudget.textContent = fmt(current().incomeCommitted);
+  }
+  
+  function renderTags() {
+    const opts = store.tags.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    expTag.innerHTML = opts || '<option value="">Sem tags</option>';
+    filterTag.innerHTML = `<option value="all">Todas as tags</option>` + opts;
+    goalTag.innerHTML = opts || '<option value="">Selecione uma tag</option>';
+  }
+  
+  function renderExpenses() {
+    const q = (search.value || '').trim().toLowerCase();
+    const tag = filterTag.value;
+    const dateFrom = filterDateFrom.value;
+    const dateTo = filterDateTo.value;
+    
+    let items = current().expenses.filter(e => {
+      if (tag !== 'all' && e.tagId !== tag) return false;
+      if (q && !(e.description || '').toLowerCase().includes(q)) return false;
+      if (dateFrom && e.date < dateFrom) return false;
+      if (dateTo && e.date > dateTo) return false;
+      return true;
+    });
+    
+    items.sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
+    
+    if (items.length === 0) {
+      expTable.innerHTML = `<tr><td colspan="5" class="empty-state"><div>📭 Nenhuma despesa encontrada</div></td></tr>`;
+    } else {
+      expTable.innerHTML = items.map(e => {
+        const t = store.tags.find(x => x.id === e.tagId);
+        const tagHtml = t ? `<span class="badge"><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</span>` : '<span class="muted">Sem tag</span>';
+        return `<tr>
+          <td>${formatDateBR(e.date)}</td>
+          <td>${esc(e.description || '')}</td>
+          <td>${tagHtml}</td>
+          <td class="right"><strong>${fmt(e.amount)}</strong></td>
+          <td class="right">
+            <button class="btn ghost icon" data-edit="${e.id}" title="Editar">✏️</button>
+            <button class="btn ghost icon" data-del="${e.id}" title="Excluir">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('');
+      
+      expTable.querySelectorAll("[data-edit]").forEach(b => {
+        b.addEventListener('click', () => {
+          const id = b.getAttribute('data-edit');
+          const e = current().expenses.find(x => x.id === id);
+          if (!e) return;
+          editingExpId = id;
+          expDesc.value = e.description;
+          expVal.value = fmt2(e.amount);
+          expDate.value = e.date;
+          expTag.value = e.tagId || "";
+          expSubmit.textContent = "💾 Salvar edição";
+          expCancel.style.display = "inline-flex";
+          window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+      });
+      
+      expTable.querySelectorAll("[data-del]").forEach(b => {
+        b.addEventListener('click', () => {
+          if (!confirm('Deseja excluir esta despesa?')) return;
+          const id = b.getAttribute('data-del');
+          current().expenses = current().expenses.filter(x => x.id !== id);
+          save();
+          refresh(false);
+          toast('Despesa excluída', 'success');
+        });
+      });
+    }
+    
+    const total = items.reduce((s, e) => s + Number(e.amount || 0), 0);
+    sumFiltered.textContent = fmt(total);
+    return total;
+  }
+  
+  function renderInvestments() {
+    const q = (searchInv.value || '').trim().toLowerCase();
+    const cat = filterCat.value;
+    
+    let items = current().investments.filter(i => {
+      if (cat !== 'all' && i.category !== cat) return false;
+      if (q && !((i.description || '').toLowerCase().includes(q) || (i.broker || '').toLowerCase().includes(q))) return false;
+      return true;
+    });
+    
+    items.sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
+    
+    if (items.length === 0) {
+      invTable.innerHTML = `<tr><td colspan="6" class="empty-state"><div>📭 Nenhum investimento encontrado</div></td></tr>`;
+    } else {
+      invTable.innerHTML = items.map(i => `<tr>
+        <td>${formatDateBR(i.date)}</td>
+        <td>${esc(i.description || '')}</td>
+        <td>${esc(i.category || '')}</td>
+        <td>${esc(i.broker || '')}</td>
+        <td class="right"><strong>${fmt(i.amount)}</strong></td>
+        <td class="right">
+          <button class="btn ghost icon" data-iedit="${i.id}" title="Editar">✏️</button>
+          <button class="btn ghost icon" data-idel="${i.id}" title="Excluir">🗑️</button>
+        </td>
+      </tr>`).join('');
+      
+      invTable.querySelectorAll("[data-iedit]").forEach(b => {
+        b.addEventListener('click', () => {
+          const id = b.getAttribute('data-iedit');
+          const i = current().investments.find(x => x.id === id);
+          if (!i) return;
+          editingInvId = id;
+          invDesc.value = i.description;
+          invCat.value = i.category;
+          invVal.value = fmt2(i.amount);
+          invDate.value = i.date;
+          invBroker.value = i.broker || "";
+          invSubmit.textContent = "💾 Salvar edição";
+          invCancel.style.display = "inline-flex";
+          window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+      });
+      
+      invTable.querySelectorAll("[data-idel]").forEach(b => {
+        b.addEventListener('click', () => {
+          if (!confirm('Deseja excluir este investimento?')) return;
+          const id = b.getAttribute('data-idel');
+          current().investments = current().investments.filter(x => x.id !== id);
+          save();
+          refresh(false);
+          toast('Investimento excluído', 'success');
+        });
+      });
+    }
+    
+    const total = items.reduce((s, i) => s + Number(i.amount || 0), 0);
+    sumInvest.textContent = fmt(total);
+    return total;
+  }
+  
+  function charts() {
+    const bars = $("#chartBars");
+    while (bars.firstChild) bars.removeChild(bars.firstChild);
+    
+    const W = 600, H = 220, pad = 36, innerW = W - pad * 2, innerH = H - pad * 2;
+    const budget = current().incomeCommitted;
+    const exp = num(sumFiltered.textContent);
+    const inv = num(sumInvest.textContent);
+    const maxv = Math.max(1, budget, exp, inv);
+    
+    const x0 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    x0.setAttribute("x1", pad);
+    x0.setAttribute("y1", H - pad);
+    x0.setAttribute("x2", W - pad);
+    x0.setAttribute("y2", H - pad);
+    x0.setAttribute("stroke", "#cbd5e1");
+    x0.setAttribute("stroke-width", "2");
+    bars.appendChild(x0);
+    
+    const labels = ["Orçamento", "Despesas", "Invest."];
+    const vals = [budget, exp, inv];
+    const barW = innerW / labels.length * 0.5;
+    
+    labels.forEach((lb, i) => {
+      const x = pad + innerW / labels.length * (i + 0.5);
+      const h = (vals[i] / maxv) * (innerH - 10);
+      const y = H - pad - h;
+      
+      const r = document.createElementNS(bars.namespaceURI, "rect");
+      r.setAttribute("x", x - barW / 2);
+      r.setAttribute("y", y);
+      r.setAttribute("width", barW);
+      r.setAttribute("height", h);
+      r.setAttribute("fill", i === 0 ? "#2563eb" : i === 1 ? "#dc2626" : "#16a34a");
+      r.setAttribute("rx", "4");
+      bars.appendChild(r);
+      
+      const t = document.createElementNS(bars.namespaceURI, "text");
+      t.setAttribute("x", x);
+      t.setAttribute("y", H - pad + 16);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("font-size", "12");
+      t.setAttribute("fill", "#64748b");
+      t.textContent = lb;
+      bars.appendChild(t);
+      
+      const v = document.createElementNS(bars.namespaceURI, "text");
+      v.setAttribute("x", x);
+      v.setAttribute("y", y - 6);
+      v.setAttribute("text-anchor", "middle");
+      v.setAttribute("font-size", "11");
+      v.setAttribute("font-weight", "600");
+      v.setAttribute("fill", "#0f172a");
+      v.textContent = fmt(vals[i]);
+      bars.appendChild(v);
+    });
+    
+    function pie(svgId, entries) {
+      const svg = $(svgId);
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      
+      const total = entries.reduce((s, [_, v]) => s + v, 0);
+      const cx = 110, cy = 110, r = 80;
+      let a0 = -Math.PI / 2;
+      
+      if (!total) {
+        const c = document.createElementNS(svg.namespaceURI, "circle");
+        c.setAttribute("cx", cx);
+        c.setAttribute("cy", cy);
+        c.setAttribute("r", r);
+        c.setAttribute("fill", "none");
+        c.setAttribute("stroke", "#e2e8f0");
+        c.setAttribute("stroke-width", "18");
+        svg.appendChild(c);
+        return;
+      }
+      
+      const colors = ["#2563eb", "#16a34a", "#9333ea", "#ea580c", "#e11d48", "#0ea5e9", "#a3e635", "#f59e0b", "#14b8a6"];
+      
+      entries.forEach(([label, val], i) => {
+        const a1 = a0 + (val / total) * Math.PI * 2;
+        const x0 = cx + r * Math.cos(a0);
+        const y0 = cy + r * Math.sin(a0);
+        const x1 = cx + r * Math.cos(a1);
+        const y1 = cy + r * Math.sin(a1);
+        const large = (a1 - a0) > Math.PI ? 1 : 0;
+        
+        const p = document.createElementNS(svg.namespaceURI, "path");
+        p.setAttribute("d", `M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`);
+        p.setAttribute("fill", colors[i % colors.length]);
+        svg.appendChild(p);
+        a0 = a1;
+      });
+    }
+    
+    const tagTotals = {};
+    (current().expenses || []).forEach(e => {
+      const key = e.tagId || 'Sem tag';
+      tagTotals[key] = (tagTotals[key] || 0) + Number(e.amount || 0);
+    });
+    const entries = Object.entries(tagTotals).map(([id, total]) => {
+      const t = store.tags.find(tt => tt.id === id);
+      return [t ? t.name : 'Sem tag', total];
+    }).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    pie("#chartPie", entries);
+    
+    const catTotals = {};
+    (current().investments || []).forEach(i => {
+      const c = i.category || 'Outros';
+      catTotals[c] = (catTotals[c] || 0) + Number(i.amount || 0);
+    });
+    const entries2 = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    pie("#chartPieInv", entries2);
+  }
+  
+  function refresh(sync) {
+    ensureMonth(month);
+    renderMonths();
+    renderIncome(!!sync);
+    renderTags();
+    const e = renderExpenses();
+    const i = renderInvestments();
+    const budget = current().incomeCommitted;
+    const spend = e + (store.countInvestAsExpense ? i : 0);
+    const saldo = budget - spend;
+    const rate = budget > 0 ? (saldo / budget) * 100 : 0;
+    
+    sumSaldo.textContent = fmt(saldo);
+    sumSaldo.className = saldo >= 0 ? 'stat-value positive' : 'stat-value negative';
+    sumRate.textContent = rate.toFixed(1) + '%';
+    sumRestante.textContent = fmt(saldo);
+    
+    // Barras de progresso
+    const ratePercent = Math.max(0, Math.min(100, rate));
+    rateProgress.style.width = ratePercent + '%';
+    rateProgress.className = ratePercent >= 50 ? 'progress-fill' : ratePercent >= 20 ? 'progress-fill warning' : 'progress-fill danger';
+    
+    const budgetPercent = budget > 0 ? Math.max(0, Math.min(100, (spend / budget) * 100)) : 0;
+    budgetProgress.style.width = budgetPercent + '%';
+    budgetProgress.className = budgetPercent <= 80 ? 'progress-fill' : budgetPercent <= 100 ? 'progress-fill warning' : 'progress-fill danger';
+    
+    charts();
+  }
+  
+  // ========== EVENTOS ==========
+  monthPicker.addEventListener('change', e => {
+    month = e.target.value;
+    save();
+    refresh(true);
+  });
+  
+  prevMonthBtn.addEventListener('click', () => addMonth(-1));
+  nextMonthBtn.addEventListener('click', () => addMonth(1));
+  
+  const moneyInputs = [inPay, inBen, inAdd, expVal, invVal];
+  moneyInputs.forEach(el => {
+    el.addEventListener('input', () => {
+      let v = el.value.replace(/[^\d.,]/g, '');
+      const parts = v.split(',');
+      if (parts.length > 2) {
+        v = parts[0] + ',' + parts.slice(1).join('');
+      }
+      v = v.replace(/\./g, ',');
+      const lastComma = v.lastIndexOf(',');
+      if (lastComma !== -1) {
+        v = v.substring(0, lastComma).replace(/,/g, '') + ',' + v.substring(lastComma + 1);
+      }
+      el.value = v;
+      
+      const d = current().incomeDraft;
+      if (el === inPay) d.payment = toNumberBR(v);
+      if (el === inBen) d.benefits = toNumberBR(v);
+      if (el === inAdd) d.additions = toNumberBR(v);
+      save();
+      renderIncome(false);
+    });
+    
+    el.addEventListener('blur', () => {
+      el.value = fmt2(toNumberBR(el.value));
+    });
+  });
+  
+  confirmIncome.addEventListener('click', () => {
+    const d = current().incomeDraft;
+    const total = Number(d.payment) + Number(d.benefits) + Number(d.additions);
+    if (total <= 0) {
+      toast('Informe valores maiores que zero', 'error');
+      return;
+    }
+    current().incomeCommitted += total;
+    d.payment = 0;
+    d.benefits = 0;
+    d.additions = 0;
+    save();
+    refresh(true);
+    toast(`Receitas confirmadas: ${fmt(total)}`, 'success');
+  });
+  
+  clearIncome.addEventListener('click', () => {
+    const d = current().incomeDraft;
+    d.payment = d.benefits = d.additions = 0;
+    save();
+    refresh(true);
+  });
+  
+  expDate.value = getTodayStr();
+  expSubmit.addEventListener('click', () => {
+    const desc = (expDesc.value || '').trim();
+    const val = toNumberBR(expVal.value);
+    const date = expDate.value;
+    
+    if (!date) {
+      toast('Informe uma data', 'error');
+      return;
+    }
+    if (val <= 0) {
+      toast('Informe um valor maior que zero', 'error');
+      return;
+    }
+    
+    const e = {
+      id: editingExpId || uid(),
+      description: desc || '(sem descrição)',
+      amount: val,
+      date: date,
+      tagId: expTag.value || null
+    };
+    
+    if (editingExpId) {
+      const ix = current().expenses.findIndex(x => x.id === editingExpId);
+      if (ix >= 0) current().expenses[ix] = e;
+      toast('Despesa atualizada', 'success');
+    } else {
+      current().expenses.unshift(e);
+      toast('Despesa adicionada', 'success');
+    }
+    
+    editingExpId = null;
+    expDesc.value = '';
+    expVal.value = '';
+    expDate.value = getTodayStr();
+    expTag.value = store.tags[0]?.id || '';
+    expSubmit.textContent = '+ Adicionar';
+    expCancel.style.display = 'none';
+    save();
+    refresh(false);
+  });
+  
+  expCancel.addEventListener('click', () => {
+    editingExpId = null;
+    expSubmit.textContent = '+ Adicionar';
+    expCancel.style.display = 'none';
+    expDesc.value = '';
+    expVal.value = '';
+    expDate.value = getTodayStr();
+    expTag.value = store.tags[0]?.id || '';
+  });
+  
+  filterTag.addEventListener('change', () => refresh(false));
+  filterDateFrom.addEventListener('change', () => refresh(false));
+  filterDateTo.addEventListener('change', () => refresh(false));
+  search.addEventListener('input', () => refresh(false));
+  
+  clearFilters.addEventListener('click', () => {
+    filterTag.value = 'all';
+    filterDateFrom.value = '';
+    filterDateTo.value = '';
+    search.value = '';
+    refresh(false);
+  });
+  
+  invDate.value = getTodayStr();
+  invSubmit.addEventListener('click', () => {
+    const desc = (invDesc.value || '').trim();
+    const val = toNumberBR(invVal.value);
+    const date = invDate.value;
+    
+    if (!date) {
+      toast('Informe uma data', 'error');
+      return;
+    }
+    if (val <= 0) {
+      toast('Informe um valor maior que zero', 'error');
+      return;
+    }
+    
+    const i = {
+      id: editingInvId || uid(),
+      description: desc || '(sem descrição)',
+      category: invCat.value || 'Outros',
+      amount: val,
+      date: date,
+      broker: (invBroker.value || '').trim()
+    };
+    
+    if (editingInvId) {
+      const ix = current().investments.findIndex(x => x.id === editingInvId);
+      if (ix >= 0) current().investments[ix] = i;
+      toast('Investimento atualizado', 'success');
+    } else {
+      current().investments.unshift(i);
+      toast('Investimento adicionado', 'success');
+    }
+    
+    editingInvId = null;
+    invDesc.value = '';
+    invVal.value = '';
+    invDate.value = getTodayStr();
+    invBroker.value = '';
+    invSubmit.textContent = '+ Adicionar';
+    invCancel.style.display = 'none';
+    save();
+    refresh(false);
+  });
+  
+  invCancel.addEventListener('click', () => {
+    editingInvId = null;
+    invSubmit.textContent = '+ Adicionar';
+    invCancel.style.display = 'none';
+    invDesc.value = '';
+    invVal.value = '';
+    invDate.value = getTodayStr();
+    invBroker.value = '';
+  });
+  
+  filterCat.addEventListener('change', () => refresh(false));
+  searchInv.addEventListener('input', () => refresh(false));
+  
+  countInvest.addEventListener('change', () => {
+    store.countInvestAsExpense = countInvest.checked;
+    save();
+    refresh(false);
+  });
+  
   // TAGS ADMIN
-  tagsBtn.addEventListener('click',()=>{editingTagId=null; tagName.value=''; tagColor.value='#2563eb'; renderTagTable(); dlgTags.showModal();});
-  tagSave.addEventListener('click',()=>{const name=tagName.value.trim()||'Nova Tag'; const color=tagColor.value||'#2563eb'; if(editingTagId){const t=store.tags.find(x=>x.id===editingTagId); if(t){t.name=name; t.color=color;}} else {store.tags.unshift({id:uid(),name,color});} editingTagId=null; tagName.value=''; tagColor.value='#2563eb'; save(); renderTagTable(); renderTags(); refresh(false);});
-  function renderTagTable(){tagTable.innerHTML=store.tags.map(t=>`<tr><td>${esc(t.name)}</td><td><span class="dot" style="background:${t.color};vertical-align:middle"></span> <code class="muted">${t.color}</code></td><td class="right"><button class="btn ghost" data-tedit="${t.id}">✏️</button><button class="btn ghost" data-tdel="${t.id}">🗑️</button></td></tr>`).join('')||`<tr><td colspan="3" class="muted" style="text-align:center;padding:20px">Nenhuma tag cadastrada.</td></tr>`; 
-    tagTable.querySelectorAll('[data-tedit]').forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-tedit'); const t=store.tags.find(x=>x.id===id); if(!t) return; editingTagId=id; tagName.value=t.name; tagColor.value=t.color;}));
-    tagTable.querySelectorAll('[data-tdel]').forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-tdel'); store.tags=store.tags.filter(x=>x.id!==id); for(const k of Object.keys(store.months)){store.months[k].expenses=store.months[k].expenses.map(e=>e.tagId===id?{...e,tagId:null}:e);} save(); renderTagTable(); renderTags(); refresh(false);}));}
-
+  tagsBtn.addEventListener('click', () => {
+    editingTagId = null;
+    tagName.value = '';
+    tagColor.value = '#2563eb';
+    renderTagTable();
+    dlgTags.showModal();
+  });
+  
+  tagSave.addEventListener('click', () => {
+    const name = tagName.value.trim();
+    if (!name) {
+      toast('Informe um nome para a tag', 'error');
+      return;
+    }
+    const color = tagColor.value || '#2563eb';
+    if (editingTagId) {
+      const t = store.tags.find(x => x.id === editingTagId);
+      if (t) {
+        t.name = name;
+        t.color = color;
+        toast('Tag atualizada', 'success');
+      }
+    } else {
+      store.tags.unshift({id: uid(), name, color});
+      toast('Tag adicionada', 'success');
+    }
+    editingTagId = null;
+    tagName.value = '';
+    tagColor.value = '#2563eb';
+    save();
+    renderTagTable();
+    renderTags();
+    refresh(false);
+  });
+  
+  function renderTagTable() {
+    if (store.tags.length === 0) {
+      tagTable.innerHTML = `<tr><td colspan="3" class="empty-state"><div>📭 Nenhuma tag cadastrada</div></td></tr>`;
+    } else {
+      tagTable.innerHTML = store.tags.map(t => `<tr>
+        <td>${esc(t.name)}</td>
+        <td><span class="badge"><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</span> <code class="muted">${t.color}</code></td>
+        <td class="right">
+          <button class="btn ghost icon" data-tedit="${t.id}" title="Editar">✏️</button>
+          <button class="btn ghost icon" data-tdel="${t.id}" title="Excluir">🗑️</button>
+        </td>
+      </tr>`).join('');
+      
+      tagTable.querySelectorAll('[data-tedit]').forEach(b => {
+        b.addEventListener('click', () => {
+          const id = b.getAttribute('data-tedit');
+          const t = store.tags.find(x => x.id === id);
+          if (!t) return;
+          editingTagId = id;
+          tagName.value = t.name;
+          tagColor.value = t.color;
+        });
+      });
+      
+      tagTable.querySelectorAll('[data-tdel]').forEach(b => {
+        b.addEventListener('click', () => {
+          const id = b.getAttribute('data-tdel');
+          const t = store.tags.find(x => x.id === id);
+          if (!confirm(`Deseja excluir a tag "${t?.name || ''}"?`)) return;
+          store.tags = store.tags.filter(x => x.id !== id);
+          for (const k of Object.keys(store.months)) {
+            store.months[k].expenses = store.months[k].expenses.map(e => 
+              e.tagId === id ? {...e, tagId: null} : e
+            );
+          }
+          save();
+          renderTagTable();
+          renderTags();
+          refresh(false);
+          toast('Tag excluída', 'success');
+        });
+      });
+    }
+  }
+  
+  // METAS
+  goalType.addEventListener('change', () => {
+    if (goalType.value === 'expense') {
+      goalLabel.textContent = 'Tag';
+      goalTag.style.display = '';
+      goalDesc.style.display = 'none';
+    } else {
+      goalLabel.textContent = 'Descrição';
+      goalTag.style.display = 'none';
+      goalDesc.style.display = '';
+    }
+  });
+  
+  goalsBtn.addEventListener('click', () => {
+    editingGoalId = null;
+    goalType.value = 'expense';
+    goalTag.value = '';
+    goalDesc.value = '';
+    goalAmount.value = '';
+    goalPeriod.value = 'month';
+    goalType.dispatchEvent(new Event('change'));
+    renderGoalTable();
+    dlgGoals.showModal();
+  });
+  
+  goalSave.addEventListener('click', () => {
+    const type = goalType.value;
+    const amount = toNumberBR(goalAmount.value);
+    
+    if (amount <= 0) {
+      toast('Informe um valor maior que zero', 'error');
+      return;
+    }
+    
+    if (type === 'expense' && !goalTag.value) {
+      toast('Selecione uma tag', 'error');
+      return;
+    }
+    
+    if (type !== 'expense' && !goalDesc.value.trim()) {
+      toast('Informe uma descrição', 'error');
+      return;
+    }
+    
+    const goal = {
+      id: editingGoalId || uid(),
+      type: type,
+      tagId: type === 'expense' ? goalTag.value : null,
+      description: type !== 'expense' ? goalDesc.value.trim() : null,
+      amount: amount,
+      period: goalPeriod.value,
+      month: month
+    };
+    
+    if (editingGoalId) {
+      const ix = store.goals.findIndex(x => x.id === editingGoalId);
+      if (ix >= 0) store.goals[ix] = goal;
+      toast('Meta atualizada', 'success');
+    } else {
+      store.goals.push(goal);
+      toast('Meta adicionada', 'success');
+    }
+    
+    editingGoalId = null;
+    goalAmount.value = '';
+    goalType.value = 'expense';
+    goalTag.value = '';
+    goalDesc.value = '';
+    goalPeriod.value = 'month';
+    save();
+    renderGoalTable();
+  });
+  
+  function renderGoalTable() {
+    const monthGoals = store.goals.filter(g => g.month === month || g.period === 'year');
+    
+    if (monthGoals.length === 0) {
+      goalTable.innerHTML = `<tr><td colspan="6" class="empty-state"><div>📭 Nenhuma meta cadastrada</div></td></tr>`;
+      return;
+    }
+    
+    goalTable.innerHTML = monthGoals.map(g => {
+      let current = 0;
+      let label = '';
+      
+      if (g.type === 'expense') {
+        const tag = store.tags.find(t => t.id === g.tagId);
+        label = tag ? tag.name : 'Tag removida';
+        current = current().expenses
+          .filter(e => e.tagId === g.tagId)
+          .reduce((s, e) => s + Number(e.amount || 0), 0);
+      } else if (g.type === 'investment') {
+        label = g.description || 'Investimentos';
+        current = current().investments
+          .reduce((s, i) => s + Number(i.amount || 0), 0);
+      } else if (g.type === 'savings') {
+        label = g.description || 'Poupança';
+        const budget = current().incomeCommitted;
+        const expenses = current().expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+        current = Math.max(0, budget - expenses);
+      }
+      
+      const progress = g.amount > 0 ? Math.min(100, (current / g.amount) * 100) : 0;
+      const progressClass = progress >= 100 ? 'success' : progress >= 80 ? 'warning' : 'danger';
+      
+      return `<tr>
+        <td>${g.type === 'expense' ? '💸' : g.type === 'investment' ? '📈' : '💰'}</td>
+        <td>${esc(label)}</td>
+        <td class="right"><strong>${fmt(g.amount)}</strong></td>
+        <td class="right">${fmt(current)}</td>
+        <td>
+          <div class="progress-bar">
+            <div class="progress-fill ${progressClass}" style="width:${progress}%"></div>
+          </div>
+          <div class="help-text">${progress.toFixed(1)}%</div>
+        </td>
+        <td class="right">
+          <button class="btn ghost icon" data-gedit="${g.id}" title="Editar">✏️</button>
+          <button class="btn ghost icon" data-gdel="${g.id}" title="Excluir">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+    
+    goalTable.querySelectorAll('[data-gedit]').forEach(b => {
+      b.addEventListener('click', () => {
+        const id = b.getAttribute('data-gedit');
+        const g = store.goals.find(x => x.id === id);
+        if (!g) return;
+        editingGoalId = id;
+        goalType.value = g.type;
+        goalType.dispatchEvent(new Event('change'));
+        if (g.type === 'expense') {
+          goalTag.value = g.tagId || '';
+        } else {
+          goalDesc.value = g.description || '';
+        }
+        goalAmount.value = fmt2(g.amount);
+        goalPeriod.value = g.period || 'month';
+      });
+    });
+    
+    goalTable.querySelectorAll('[data-gdel]').forEach(b => {
+      b.addEventListener('click', () => {
+        const id = b.getAttribute('data-gdel');
+        if (!confirm('Deseja excluir esta meta?')) return;
+        store.goals = store.goals.filter(x => x.id !== id);
+        save();
+        renderGoalTable();
+        toast('Meta excluída', 'success');
+      });
+    });
+  }
+  
   // Export/Import/Reset
-  exportBtn.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(store,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`financeiro-clean-${month}.json`; a.click(); URL.revokeObjectURL(a.href);});
-  importJSON.addEventListener('change',(ev)=>{const f=ev.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{try{store=JSON.parse(String(r.result)); month=Object.keys(store.months)[0]; countInvest.checked=!!store.countInvestAsExpense; save(); refresh(true);}catch(e){alert('Arquivo inválido')}}; r.readAsText(f);});
-  resetBtn.addEventListener('click',()=>{if(confirm("Resetar todos os dados?")){store=defaults(); month=Object.keys(store.months)[0]; save(); refresh(true);}});
-
-  // boot
-  countInvest.checked=!!store.countInvestAsExpense; refresh(true);
-})();</script>
-</body></html>
+  exportBtn.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(store, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `financeiro-clean-${month}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('Dados exportados', 'success');
+  });
+  
+  importJSON.addEventListener('change', (ev) => {
+    const f = ev.target.files?.[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const imported = JSON.parse(String(r.result));
+        store = imported;
+        if (!store.goals) store.goals = [];
+        month = Object.keys(store.months).sort().pop() || Object.keys(store.months)[0];
+        countInvest.checked = !!store.countInvestAsExpense;
+        save();
+        refresh(true);
+        toast('Dados importados com sucesso', 'success');
+      } catch (e) {
+        toast('Arquivo inválido', 'error');
+      }
+    };
+    r.readAsText(f);
+    ev.target.value = '';
+  });
+  
+  resetBtn.addEventListener('click', () => {
+    if (!confirm("Tem certeza que deseja resetar TODOS os dados? Esta ação não pode ser desfeita!")) return;
+    if (!confirm("Confirme novamente: todos os dados serão perdidos permanentemente!")) return;
+    store = defaults();
+    month = Object.keys(store.months)[0];
+    save();
+    refresh(true);
+    toast('Dados resetados', 'info');
+  });
+  
+  // Validação de formulários
+  [expDate, invDate].forEach(el => {
+    el.addEventListener('input', function() {
+      if (this.value && this.value > getTodayStr()) {
+        this.setCustomValidity('Data não pode ser futura');
+      } else {
+        this.setCustomValidity('');
+      }
+    });
+  });
+  
+  // Boot
+  countInvest.checked = !!store.countInvestAsExpense;
+  refresh(true);
+  
+  // Auto-save backup
+  setInterval(() => {
+    try {
+      const backup = JSON.stringify(store);
+      localStorage.setItem(LS_KEY + '_backup', backup);
+    } catch (e) {
+      console.error('Erro ao criar backup:', e);
+    }
+  }, 60000); // A cada minuto
+  
+})();
+</script>
+</body>
+</html>
