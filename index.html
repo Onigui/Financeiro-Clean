@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Financeiro Clean – Offline PRO (Fix)</title>
+<style>
+  :root{--bg:#fff;--fg:#0f172a;--muted:#f1f5f9;--muted-fg:#64748b;--border:#e2e8f0;--accent:#2563eb;--ring:rgba(15,23,42,.06)}
+  *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  .container{max-width:1200px;margin:0 auto;padding:16px}
+  .topbar{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--border);z-index:20}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.spacer{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);padding:8px 10px;border-radius:12px;background:#fff;cursor:pointer;box-shadow:0 8px 20px -12px var(--ring);white-space:nowrap}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)} .btn.ghost{border-color:transparent;background:transparent} .btn.icon{width:36px;height:36px;justify-content:center}
+  .card{border:1px solid var(--border);border-radius:16px;background:#fff;box-shadow:0 12px 28px -18px var(--ring)} .card .hd{padding:14px 16px 6px 16px;font-weight:600} .card .bd{padding:10px 16px 16px 16px}
+  .grid{display:grid;gap:12px} .grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))} .grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))} .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media (max-width:980px){.grid.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))} .grid.cols-3{grid-template-columns:repeat(1,minmax(0,1fr))}} @media (max-width:640px){.grid.cols-4{grid-template-columns:repeat(1,minmax(0,1fr))}}
+  .label{font-size:12px;color:var(--muted-fg);margin-bottom:4px;display:block} .input,.select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;outline:none}
+  .input:focus,.select:focus{box-shadow:0 0 0 4px var(--ring)} .kpi{font-size:22px;font-weight:600} .muted{color:var(--muted-fg)} .sep{height:1px;background:var(--border);margin:6px 0}
+  table{width:100%;border-collapse:collapse} thead th{background:var(--muted);text-align:left;padding:10px;border-bottom:1px solid var(--border);font-weight:600} tbody td{padding:10px;border-bottom:1px solid var(--border)}
+  tr:hover td{background:#fafafa} .right{text-align:right} .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:4px 8px;font-size:12px;background:#fff} .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .pilltabs{display:inline-flex;border:1px solid var(--border);padding:4px;border-radius:12px;background:#fff} .pilltabs button{border:0;background:transparent;padding:6px 10px;border-radius:8px;cursor:pointer} .pilltabs button[data-active="true"]{background:var(--muted)}
+  .chart{width:100%;height:220px;border:1px solid var(--border);border-radius:12px;display:block}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container row" style="padding:10px 16px">
+      <div class="row" style="gap:10px">
+        <strong>Financeiro Clean PRO</strong>
+        <select id="monthPicker" class="select" style="width:180px"></select>
+        <button class="btn icon" id="prevMonthBtn">◀</button>
+        <button class="btn icon" id="nextMonthBtn">▶</button>
+      </div>
+      <div class="spacer"></div>
+      <label class="btn"><input type="file" id="importJSON" accept="application/json" hidden>📤 Importar</label>
+      <button class="btn" id="exportBtn">📥 Exportar</button>
+      <button class="btn ghost icon" id="tagsBtn">🏷️</button>
+      <button class="btn ghost icon" id="resetBtn">♻️</button>
+    </div>
+  </div>
+
+  <div class="container grid" style="margin-top:12px;gap:12px">
+    <div class="grid cols-4">
+      <div class="card"><div class="hd">Pagamento</div><div class="bd kpi" id="kpiPayment">R$ 0,00</div></div>
+      <div class="card"><div class="hd">Benefícios</div><div class="bd kpi" id="kpiBenefits">R$ 0,00</div></div>
+      <div class="card"><div class="hd">Adicionais</div><div class="bd kpi" id="kpiAdditions">R$ 0,00</div></div>
+      <div class="card"><div class="hd">Orçamento confirmado</div><div class="bd kpi" id="kpiBudget">R$ 0,00</div></div>
+    </div>
+
+    <div class="grid cols-3">
+      <div class="card">
+        <div class="hd">Receitas do mês</div>
+        <div class="bd grid">
+          <label class="label">Pagamento total</label><input id="inPay" class="input money" inputmode="decimal" placeholder="0,00">
+          <label class="label">Benefícios</label><input id="inBen" class="input money" inputmode="decimal" placeholder="0,00">
+          <label class="label">Adicionais</label><input id="inAdd" class="input money" inputmode="decimal" placeholder="0,00">
+          <div class="sep"></div>
+          <div class="row" style="justify-content:space-between"><span class="muted">Receita total (prévia)</span><strong id="inTotal">R$ 0,00</strong></div>
+          <div class="row" style="gap:8px"><button class="btn primary" id="confirmIncome">Confirmar receitas</button><button class="btn" id="clearIncome">Limpar</button></div>
+          <div class="muted" style="font-size:12px">Confirmar soma ao orçamento do mês. Pode confirmar várias vezes.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">Lançar despesa</div>
+        <div class="bd grid">
+          <label class="label">Descrição</label><input id="expDesc" class="input" placeholder="Ex.: Mercado, Uber, Aluguel">
+          <div class="grid cols-2">
+            <div><label class="label">Valor</label><input id="expVal" class="input money" inputmode="decimal" placeholder="0,00"></div>
+            <div><label class="label">Data</label><input id="expDate" class="input" type="date"></div>
+          </div>
+          <label class="label">Tag</label><select id="expTag" class="select"></select>
+          <div class="row"><button class="btn" id="expSubmit">Adicionar</button><button class="btn" id="expCancel" style="display:none">Cancelar</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">Resumo</div>
+        <div class="bd grid">
+          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="countInvest" checked>Contar investimentos como despesa</label>
+          <div class="row" style="justify-content:space-between"><span>Despesas filtradas</span><strong id="sumFiltered">R$ 0,00</strong></div>
+          <div class="row" style="justify-content:space-between"><span>Total investido (filtro)</span><strong id="sumInvest">R$ 0,00</strong></div>
+          <div class="sep"></div>
+          <div class="row" style="justify-content:space-between"><span>Orçamento do mês</span><strong id="sumBudget">R$ 0,00</strong></div>
+          <div class="row" style="justify-content:space-between"><span>Saldo do mês</span><strong id="sumSaldo">R$ 0,00</strong></div>
+          <div class="row" style="justify-content:space-between"><span>Taxa de poupança</span><strong id="sumRate">0,0%</strong></div>
+          <div class="row" style="justify-content:space-between"><span>Restante do orçamento</span><strong id="sumRestante">R$ 0,00</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd row" style="justify-content:space-between">
+        <div>Despesas</div>
+        <div class="row"><span class="muted" style="font-size:12px;margin-right:6px">Filtrar:</span><select id="filterTag" class="select" style="width:160px"></select><input id="search" class="input" placeholder="Buscar descrição..." style="margin-left:8px;width:220px"></div>
+      </div>
+      <div class="bd">
+        <div style="overflow:auto;border:1px solid var(--border);border-radius:12px">
+          <table><thead><tr><th>Data</th><th>Descrição</th><th>Tag</th><th class="right">Valor</th><th></th></tr></thead><tbody id="expTable"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">Investimentos</div>
+      <div class="bd grid">
+        <div class="grid cols-3">
+          <div><label class="label">Ativo / Descrição</label><input id="invDesc" class="input" placeholder="Ex.: Tesouro Selic 2029, PETR4, BTC"></div>
+          <div><label class="label">Categoria</label><select id="invCat" class="select"><option>Renda Fixa</option><option>Ações</option><option>Fundos</option><option>Cripto</option><option>Poupança</option><option>Outros</option></select></div>
+          <div class="grid cols-2"><div><label class="label">Valor</label><input id="invVal" class="input money" inputmode="decimal" placeholder="0,00"></div><div><label class="label">Data</label><input id="invDate" class="input" type="date"></div></div>
+        </div>
+        <div class="grid cols-2">
+          <div><label class="label">Corretora/Conta</label><input id="invBroker" class="input" placeholder="Ex.: Nubank, XP, Binance"></div>
+          <div style="display:flex;align-items:flex-end;gap:8px"><button class="btn" id="invSubmit">Adicionar</button><button class="btn" id="invCancel" style="display:none">Cancelar</button></div>
+        </div>
+
+        <div class="row" style="justify-content:space-between">
+          <div class="row" style="gap:8px"><span class="muted" style="font-size:12px">Filtrar:</span>
+            <select id="filterCat" class="select" style="width:180px"><option value="all">Todas as categorias</option><option>Renda Fixa</option><option>Ações</option><option>Fundos</option><option>Cripto</option><option>Poupança</option><option>Outros</option></select>
+            <input id="searchInv" class="input" placeholder="Buscar por ativo/corretora..." style="width:220px">
+          </div>
+        </div>
+
+        <div style="overflow:auto;border:1px solid var(--border);border-radius:12px">
+          <table><thead><tr><th>Data</th><th>Ativo</th><th>Categoria</th><th>Corretora</th><th class="right">Valor</th><th></th></tr></thead><tbody id="invTable"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid cols-3">
+      <div class="card"><div class="hd">Gráfico: Orçamento × Despesas × Investimentos</div><div class="bd"><svg id="chartBars" class="chart" viewBox="0 0 600 220"></svg></div></div>
+      <div class="card"><div class="hd">Despesas por Tag (pizza)</div><div class="bd"><svg id="chartPie" class="chart" viewBox="0 0 220 220"></svg></div></div>
+      <div class="card"><div class="hd">Investimentos por Categoria (pizza)</div><div class="bd"><svg id="chartPieInv" class="chart" viewBox="0 0 220 220"></svg></div></div>
+    </div>
+  </div>
+
+  <dialog id="dlgTags">
+    <div class="dlg-hd">Administração de Tags</div>
+    <div class="dlg-bd grid">
+      <div class="grid cols-3">
+        <div class="grid" style="gap:6px"><label class="label">Nome</label><input id="tagName" class="input" placeholder="Ex.: Mercado, Transporte..."></div>
+        <div class="grid" style="gap:6px"><label class="label">Cor</label><input id="tagColor" class="input" type="color" value="#2563eb"></div>
+        <div class="grid" style="gap:6px;align-content:end"><button class="btn" id="tagSave">Salvar/Adicionar</button></div>
+      </div>
+      <div class="sep"></div>
+      <div style="overflow:auto;border:1px solid var(--border);border-radius:12px">
+        <table><thead><tr><th>Tag</th><th>Cor</th><th></th></tr></thead><tbody id="tagTable"></tbody></table>
+      </div>
+    </div>
+    <div class="dlg-ft"><button class="btn" onclick="document.getElementById('dlgTags').close()">Fechar</button></div>
+  </dialog>
+
+<script>
+(function(){
+  const LS_KEY="financeiro_clean_pro_v1";
+  const $=(s)=>document.querySelector(s); const $$=(s)=>Array.from(document.querySelectorAll(s));
+  const defaults=()=>{const now=new Date();const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;function uid(){return Math.random().toString(36).slice(2,10)}return{tags:[{id:uid(),name:"Alimentação",color:"#16a34a"},{id:uid(),name:"Transporte",color:"#2563eb"},{id:uid(),name:"Moradia",color:"#ea580c"},{id:uid(),name:"Contas",color:"#9333ea"},{id:uid(),name:"Lazer",color:"#e11d48"}],months:{[ym]:{incomeDraft:{payment:0,benefits:0,additions:0},incomeCommitted:0,expenses:[],investments:[]}},countInvestAsExpense:true};};
+  function load(){try{return JSON.parse(localStorage.getItem(LS_KEY))||defaults();}catch{return defaults();}}
+  function save(){localStorage.setItem(LS_KEY,JSON.stringify(store));}
+  const toNumberBR=(s)=>{if(typeof s!=='string')s=String(s??'');s=s.replace(/\./g,'').replace(',', '.');const n=parseFloat(s);return isNaN(n)?0:n;};
+  const fmt=(n)=>(Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const fmt2=(n)=>(Number(n)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  let store=load(); let month=Object.keys(store.months)[0];
+  let editingExpId=null, editingTagId=null, editingInvId=null;
+  const monthPicker=$("#monthPicker"), prevMonthBtn=$("#prevMonthBtn"), nextMonthBtn=$("#nextMonthBtn");
+  const inPay=$("#inPay"), inBen=$("#inBen"), inAdd=$("#inAdd"), inTotal=$("#inTotal"), confirmIncome=$("#confirmIncome"), clearIncome=$("#clearIncome");
+  const kpiPayment=$("#kpiPayment"), kpiBenefits=$("#kpiBenefits"), kpiAdditions=$("#kpiAdditions"), kpiBudget=$("#kpiBudget");
+  const expDesc=$("#expDesc"), expVal=$("#expVal"), expDate=$("#expDate"), expTag=$("#expTag"), expSubmit=$("#expSubmit"), expCancel=$("#expCancel"), filterTag=$("#filterTag"), search=$("#search"), expTable=$("#expTable");
+  const invDesc=$("#invDesc"), invCat=$("#invCat"), invVal=$("#invVal"), invDate=$("#invDate"), invBroker=$("#invBroker"), invSubmit=$("#invSubmit"), invCancel=$("#invCancel"), filterCat=$("#filterCat"), searchInv=$("#searchInv"), invTable=$("#invTable");
+  const countInvest=$("#countInvest"), sumFiltered=$("#sumFiltered"), sumInvest=$("#sumInvest"), sumBudget=$("#sumBudget"), sumSaldo=$("#sumSaldo"), sumRate=$("#sumRate"), sumRestante=$("#sumRestante");
+  const exportBtn=$("#exportBtn"), importJSON=$("#importJSON"), tagsBtn=$("#tagsBtn"), resetBtn=$("#resetBtn");
+  const dlgTags=$("#dlgTags"), tagName=$("#tagName"), tagColor=$("#tagColor"), tagSave=$("#tagSave"), tagTable=$("#tagTable");
+
+  function ensureMonth(ym){if(!store.months[ym]) store.months[ym]={incomeDraft:{payment:0,benefits:0,additions:0},incomeCommitted:0,expenses:[],investments:[]};}
+  function current(){return store.months[month]}
+  function uid(){return Math.random().toString(36).slice(2,10)}
+
+  function renderMonths(){const list=Object.keys(store.months); if(!list.includes(month)) list.push(month); list.sort(); monthPicker.innerHTML=list.map(ym=>`<option value="${ym}">${new Date(ym+'-01').toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</option>`).join(''); monthPicker.value=month;}
+  function addMonth(delta){const [y,m]=month.split('-').map(Number); const d=new Date(y,m-1+delta,1); const ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; ensureMonth(ym); month=ym; save(); refresh(true);}
+
+  function renderIncome(sync){const d=current().incomeDraft; const total=Number(d.payment)+Number(d.benefits)+Number(d.additions); if(sync){inPay.value=fmt2(d.payment); inBen.value=fmt2(d.benefits); inAdd.value=fmt2(d.additions);} inTotal.textContent=fmt(total); kpiPayment.textContent=fmt(d.payment); kpiBenefits.textContent=fmt(d.benefits); kpiAdditions.textContent=fmt(d.additions); kpiBudget.textContent=fmt(current().incomeCommitted); sumBudget.textContent=fmt(current().incomeCommitted);}
+
+  function renderTags(){const opts=store.tags.map(t=>`<option value="${t.id}">${t.name}</option>`).join(''); expTag.innerHTML=opts; filterTag.innerHTML=`<option value="all">Todas as tags</option>`+opts;}
+
+  function renderExpenses(){const q=(search.value||'').trim().toLowerCase(); const tag=filterTag.value; const items=current().expenses.filter(e=>tag==='all'?true:e.tagId===tag).filter(e=>q? (e.description||'').toLowerCase().includes(q):true).sort((a,b)=>new Date(b.date)-new Date(a.date)); expTable.innerHTML=items.map(e=>{const t=store.tags.find(x=>x.id===e.tagId); const tagHtml=t?`<span class="badge"><span class="dot" style="background:${t.color}"></span>${t.name}</span>`:'<span class="muted">Sem tag</span>'; return `<tr><td>${new Date(e.date).toLocaleDateString('pt-BR')}</td><td>${esc(e.description||'')}</td><td>${tagHtml}</td><td class="right"><strong>${fmt(e.amount)}</strong></td><td class="right"><button class="btn ghost" data-edit="${e.id}">✏️</button><button class="btn ghost" data-del="${e.id}">🗑️</button></td></tr>`}).join(''); 
+    expTable.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-edit');const e=current().expenses.find(x=>x.id===id); if(!e) return; editingExpId=id; expDesc.value=e.description; expVal.value=fmt2(e.amount); expDate.value=e.date; expTag.value=e.tagId||""; expSubmit.textContent="Salvar edição"; expCancel.style.display="inline-flex"; window.scrollTo({top:0,behavior:'smooth'})}));
+    expTable.querySelectorAll("[data-del]").forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-del'); current().expenses=current().expenses.filter(x=>x.id!==id); save(); refresh(false);}));
+    const total=items.reduce((s,e)=>s+Number(e.amount||0),0); sumFiltered.textContent=fmt(total); return total;}
+
+  function renderInvestments(){const q=(searchInv.value||'').trim().toLowerCase(); const cat=filterCat.value; const items=current().investments.filter(i=>cat==='all'?true:i.category===cat).filter(i=>q? ((i.description||'').toLowerCase().includes(q)||(i.broker||'').toLowerCase().includes(q)):true).sort((a,b)=>new Date(b.date)-new Date(a.date)); invTable.innerHTML=items.map(i=>`<tr><td>${new Date(i.date).toLocaleDateString('pt-BR')}</td><td>${esc(i.description||'')}</td><td>${esc(i.category||'')}</td><td>${esc(i.broker||'')}</td><td class="right"><strong>${fmt(i.amount)}</strong></td><td class="right"><button class="btn ghost" data-iedit="${i.id}">✏️</button><button class="btn ghost" data-idel="${i.id}">🗑️</button></td></tr>`).join('')||`<tr><td colspan="6" class="muted" style="text-align:center;padding:18px">Sem investimentos lançados.</td></tr>`;
+    invTable.querySelectorAll("[data-iedit]").forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-iedit');const i=current().investments.find(x=>x.id===id); if(!i) return; editingInvId=id; invDesc.value=i.description; invCat.value=i.category; invVal.value=fmt2(i.amount); invDate.value=i.date; invBroker.value=i.broker||""; invSubmit.textContent="Salvar edição"; invCancel.style.display="inline-flex"; window.scrollTo({top:0,behavior:'smooth'})}));
+    invTable.querySelectorAll("[data-idel]").forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-idel'); current().investments=current().investments.filter(x=>x.id!==id); save(); refresh(false);}));
+    const total=items.reduce((s,i)=>s+Number(i.amount||0),0); sumInvest.textContent=fmt(total); return total;}
+
+  function charts(){const bars=$("#chartBars"); while(bars.firstChild) bars.removeChild(bars.firstChild); const W=600,H=220,pad=36,innerW=W-pad*2,innerH=H-pad*2;
+    const budget=current().incomeCommitted; const exp=num(sumFiltered.textContent); const inv=num(sumInvest.textContent); const maxv=Math.max(1,budget,exp,inv);
+    const x0=document.createElementNS("http://www.w3.org/2000/svg","line"); x0.setAttribute("x1",pad); x0.setAttribute("y1",H-pad); x0.setAttribute("x2",W-pad); x0.setAttribute("y2",H-pad); x0.setAttribute("stroke","#cbd5e1"); bars.appendChild(x0);
+    const labels=["Orçamento","Despesas","Invest."], vals=[budget,exp,inv], barW=innerW/labels.length*0.5;
+    labels.forEach((lb,i)=>{const x=pad+innerW/labels.length*(i+0.5); const h=(vals[i]/maxv)*(innerH-10); const y=H-pad-h;
+      const r=document.createElementNS(bars.namespaceURI,"rect"); r.setAttribute("x",x-barW/2); r.setAttribute("y",y); r.setAttribute("width",barW); r.setAttribute("height",h); r.setAttribute("fill","#2563eb"); bars.appendChild(r);
+      const t=document.createElementNS(bars.namespaceURI,"text"); t.setAttribute("x",x); t.setAttribute("y",H-pad+16); t.setAttribute("text-anchor","middle"); t.setAttribute("font-size","12"); t.textContent=lb; bars.appendChild(t);
+      const v=document.createElementNS(bars.namespaceURI,"text"); v.setAttribute("x",x); v.setAttribute("y",y-6); v.setAttribute("text-anchor","middle"); v.setAttribute("font-size","12"); v.textContent=fmt(vals[i]); bars.appendChild(v); });
+    function pie(svgId, entries){const svg=$(svgId); while(svg.firstChild) svg.removeChild(svg.firstChild); const total=entries.reduce((s,[_,v])=>s+v,0); const cx=110,cy=110,r=80; let a0=-Math.PI/2;
+      if(!total){const c=document.createElementNS(svg.namespaceURI,"circle"); c.setAttribute("cx",cx); c.setAttribute("cy",cy); c.setAttribute("r",r); c.setAttribute("fill","none"); c.setAttribute("stroke","#e2e8f0"); c.setAttribute("stroke-width","18"); svg.appendChild(c); return;}
+      const colors=["#2563eb","#16a34a","#9333ea","#ea580c","#e11d48","#0ea5e9","#a3e635","#f59e0b","#14b8a6"];
+      entries.forEach(([label,val],i)=>{const a1=a0+(val/total)*Math.PI*2; const x0=cx+r*Math.cos(a0), y0=cy+r*Math.sin(a0); const x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1); const large=(a1-a0)>Math.PI?1:0;
+        const p=document.createElementNS(svg.namespaceURI,"path"); p.setAttribute("d",`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`); p.setAttribute("fill",colors[i%colors.length]); svg.appendChild(p); a0=a1;});}
+    const tagTotals={}; (current().expenses||[]).forEach(e=>{const key=e.tagId||'Sem tag'; tagTotals[key]=(tagTotals[key]||0)+Number(e.amount||0)});
+    const entries=Object.entries(tagTotals).map(([id,total])=>{const t=store.tags.find(tt=>tt.id===id); return [t? t.name:'Sem tag', total]}).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    pie("#chartPie", entries);
+    const catTotals={}; (current().investments||[]).forEach(i=>{const c=i.category||'Outros'; catTotals[c]=(catTotals[c]||0)+Number(i.amount||0)});
+    const entries2=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,8); pie("#chartPieInv", entries2);
+  }
+  function num(s){const x=String(s).replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',', '.'); const n=parseFloat(x); return isNaN(n)?0:n;}
+  function esc(s){return (s||'').replace(/[&<>'"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c] || c;});}
+
+  function refresh(sync){ensureMonth(month); renderMonths(); renderIncome(!!sync); renderTags(); const e=renderExpenses(); const i=renderInvestments(); const budget=current().incomeCommitted; const spend=e + (store.countInvestAsExpense? i:0); const saldo=budget-spend; const rate=budget>0?(saldo/budget)*100:0; sumSaldo.textContent=fmt(saldo); sumRate.textContent=rate.toFixed(1)+'%'; sumRestante.textContent=fmt(saldo); charts();}
+
+  monthPicker.addEventListener('change',e=>{month=e.target.value; save(); refresh(true)}); prevMonthBtn.addEventListener('click',()=>addMonth(-1)); nextMonthBtn.addEventListener('click',()=>addMonth(1));
+  const moneyInputs=[inPay,inBen,inAdd,expVal,invVal]; moneyInputs.forEach(el=>{el.addEventListener('input',()=>{let v=el.value.replace(/[^\d.,]/g,''); v=v.replace(/\./g,','); el.value=v; const d=current().incomeDraft; if(el===inPay) d.payment=toNumberBR(v); if(el===inBen) d.benefits=toNumberBR(v); if(el===inAdd) d.additions=toNumberBR(v); save(); renderIncome(false);}); el.addEventListener('blur',()=>{el.value=fmt2(toNumberBR(el.value));});});
+  confirmIncome.addEventListener('click',()=>{const d=current().incomeDraft; const total=Number(d.payment)+Number(d.benefits)+Number(d.additions); current().incomeCommitted+=total; d.payment=0; d.benefits=0; d.additions=0; save(); refresh(true)});
+  clearIncome.addEventListener('click',()=>{const d=current().incomeDraft; d.payment=d.benefits=d.additions=0; save(); refresh(true)});
+  expDate.value=new Date().toISOString().slice(0,10); expSubmit.addEventListener('click',()=>{const e={id:editingExpId||uid(),description:(expDesc.value||'').trim()||'(sem descrição)',amount:toNumberBR(expVal.value),date:expDate.value,tagId:expTag.value||null}; if(editingExpId){const ix=current().expenses.findIndex(x=>x.id===editingExpId); if(ix>=0) current().expenses[ix]=e;} else{current().expenses.unshift(e);} editingExpId=null; expDesc.value=''; expVal.value=''; expDate.value=new Date().toISOString().slice(0,10); expTag.value=store.tags[0]?.id||''; expSubmit.textContent='Adicionar'; expCancel.style.display='none'; save(); refresh(false)});
+  expCancel.addEventListener('click',()=>{editingExpId=null; expSubmit.textContent='Adicionar'; expCancel.style.display='none'; expDesc.value=''; expVal.value=''; expDate.value=new Date().toISOString().slice(0,10); expTag.value=store.tags[0]?.id||'';});
+  filterTag.addEventListener('change',()=>refresh(false)); search.addEventListener('input',()=>refresh(false));
+  invDate.value=new Date().toISOString().slice(0,10); invSubmit.addEventListener('click',()=>{const i={id:editingInvId||uid(),description:(invDesc.value||'').trim()||'(sem descrição)',category:invCat.value||'Outros',amount:toNumberBR(invVal.value),date:invDate.value,broker:(invBroker.value||'').trim()}; if(editingInvId){const ix=current().investments.findIndex(x=>x.id===editingInvId); if(ix>=0) current().investments[ix]=i;} else{current().investments.unshift(i);} editingInvId=null; invDesc.value=''; invVal.value=''; invDate.value=new Date().toISOString().slice(0,10); invBroker.value=''; invSubmit.textContent='Adicionar'; invCancel.style.display='none'; save(); refresh(false)});
+  invCancel.addEventListener('click',()=>{editingInvId=null; invSubmit.textContent='Adicionar'; invCancel.style.display='none'; invDesc.value=''; invVal.value=''; invDate.value=new Date().toISOString().slice(0,10); invBroker.value='';});
+  filterCat.addEventListener('change',()=>refresh(false)); searchInv.addEventListener('input',()=>refresh(false)); countInvest.addEventListener('change',()=>{store.countInvestAsExpense=countInvest.checked; save(); refresh(false)});
+
+  // TAGS ADMIN
+  tagsBtn.addEventListener('click',()=>{editingTagId=null; tagName.value=''; tagColor.value='#2563eb'; renderTagTable(); dlgTags.showModal();});
+  tagSave.addEventListener('click',()=>{const name=tagName.value.trim()||'Nova Tag'; const color=tagColor.value||'#2563eb'; if(editingTagId){const t=store.tags.find(x=>x.id===editingTagId); if(t){t.name=name; t.color=color;}} else {store.tags.unshift({id:uid(),name,color});} editingTagId=null; tagName.value=''; tagColor.value='#2563eb'; save(); renderTagTable(); renderTags(); refresh(false);});
+  function renderTagTable(){tagTable.innerHTML=store.tags.map(t=>`<tr><td>${esc(t.name)}</td><td><span class="dot" style="background:${t.color};vertical-align:middle"></span> <code class="muted">${t.color}</code></td><td class="right"><button class="btn ghost" data-tedit="${t.id}">✏️</button><button class="btn ghost" data-tdel="${t.id}">🗑️</button></td></tr>`).join('')||`<tr><td colspan="3" class="muted" style="text-align:center;padding:20px">Nenhuma tag cadastrada.</td></tr>`; 
+    tagTable.querySelectorAll('[data-tedit]').forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-tedit'); const t=store.tags.find(x=>x.id===id); if(!t) return; editingTagId=id; tagName.value=t.name; tagColor.value=t.color;}));
+    tagTable.querySelectorAll('[data-tdel]').forEach(b=>b.addEventListener('click',()=>{const id=b.getAttribute('data-tdel'); store.tags=store.tags.filter(x=>x.id!==id); for(const k of Object.keys(store.months)){store.months[k].expenses=store.months[k].expenses.map(e=>e.tagId===id?{...e,tagId:null}:e);} save(); renderTagTable(); renderTags(); refresh(false);}));}
+
+  // Export/Import/Reset
+  exportBtn.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(store,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`financeiro-clean-${month}.json`; a.click(); URL.revokeObjectURL(a.href);});
+  importJSON.addEventListener('change',(ev)=>{const f=ev.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{try{store=JSON.parse(String(r.result)); month=Object.keys(store.months)[0]; countInvest.checked=!!store.countInvestAsExpense; save(); refresh(true);}catch(e){alert('Arquivo inválido')}}; r.readAsText(f);});
+  resetBtn.addEventListener('click',()=>{if(confirm("Resetar todos os dados?")){store=defaults(); month=Object.keys(store.months)[0]; save(); refresh(true);}});
+
+  // boot
+  countInvest.checked=!!store.countInvestAsExpense; refresh(true);
+})();</script>
+</body></html>
