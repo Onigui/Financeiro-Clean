@@ -196,8 +196,8 @@
     <!-- Gráficos -->
     <div class="grid cols-3" style="margin-top:12px">
       <div class="card"><div class="hd">📊 Comparativo</div><div class="bd"><svg id="chartBars" class="chart" viewBox="0 0 600 220"></svg></div></div>
-      <div class="card"><div class="hd">🎨 Despesas por Tag</div><div class="bd"><svg id="chartPie" class="chart" viewBox="0 0 220 220"></svg></div></div>
-      <div class="card"><div class="hd">💎 Investimentos por Categoria</div><div class="bd"><svg id="chartPieInv" class="chart" viewBox="0 0 220 220"></svg></div></div>
+      <div class="card"><div class="hd">🎨 Despesas por Tag</div><div class="bd"><svg id="chartPie" class="chart" viewBox="0 0 220 235" style="height:240px"></svg></div></div>
+      <div class="card"><div class="hd">💎 Investimentos por Categoria</div><div class="bd"><svg id="chartPieInv" class="chart" viewBox="0 0 220 235" style="height:240px"></svg></div></div>
     </div>
   </div>
 
@@ -583,7 +583,7 @@
     // Bar chart
     const bars=$("#chartBars");
     while(bars.firstChild) bars.removeChild(bars.firstChild);
-    const W=600,H=220,pad=40,innerW=W-pad*2,innerH=H-pad*2;
+    const W=600,H=220,pad=45,innerW=W-pad*2,innerH=H-pad*2;
     
     const budget=current().incomeCommitted;
     const exp=current().expenses.reduce((s,e)=>s+Number(e.amount||0),0);
@@ -600,7 +600,7 @@
     
     labels.forEach((lb,i)=>{
       const x=pad+innerW/labels.length*(i+0.5);
-      const h=(vals[i]/maxv)*(innerH-10);
+      const h=(vals[i]/maxv)*(innerH-15);
       const y=H-pad-h;
       
       const r=document.createElementNS(bars.namespaceURI,"rect");
@@ -608,12 +608,12 @@
       r.setAttribute("fill",colors[i]);r.setAttribute("rx","4");bars.appendChild(r);
       
       const t=document.createElementNS(bars.namespaceURI,"text");
-      t.setAttribute("x",x);t.setAttribute("y",H-pad+18);t.setAttribute("text-anchor","middle");
-      t.setAttribute("font-size","11");t.setAttribute("fill","#64748b");t.textContent=lb;bars.appendChild(t);
+      t.setAttribute("x",x);t.setAttribute("y",H-pad+20);t.setAttribute("text-anchor","middle");
+      t.setAttribute("font-size","14");t.setAttribute("font-weight","600");t.setAttribute("fill","#475569");t.textContent=lb;bars.appendChild(t);
       
       const v=document.createElementNS(bars.namespaceURI,"text");
-      v.setAttribute("x",x);v.setAttribute("y",y-6);v.setAttribute("text-anchor","middle");
-      v.setAttribute("font-size","11");v.setAttribute("font-weight","600");v.setAttribute("fill","#0f172a");
+      v.setAttribute("x",x);v.setAttribute("y",y-8);v.setAttribute("text-anchor","middle");
+      v.setAttribute("font-size","15");v.setAttribute("font-weight","700");v.setAttribute("fill","#0f172a");
       v.textContent=fmtShort(vals[i]);bars.appendChild(v);
     });
     
@@ -622,7 +622,7 @@
       const svg=$(svgId);
       while(svg.firstChild) svg.removeChild(svg.firstChild);
       const total=entries.reduce((s,[_,v])=>s+v,0);
-      const cx=110,cy=110,r=70;
+      const cx=110,cy=90,r=65;
       let a0=-Math.PI/2;
       
       if(!total){
@@ -632,7 +632,7 @@
         svg.appendChild(c);
         const t=document.createElementNS(svg.namespaceURI,"text");
         t.setAttribute("x",cx);t.setAttribute("y",cy);t.setAttribute("text-anchor","middle");
-        t.setAttribute("font-size","12");t.setAttribute("fill","#94a3b8");t.textContent="Sem dados";
+        t.setAttribute("font-size","14");t.setAttribute("font-weight","600");t.setAttribute("fill","#94a3b8");t.textContent="Sem dados";
         svg.appendChild(t);
         return;
       }
@@ -650,21 +650,41 @@
         p.setAttribute("fill",colors[i%colors.length]);
         svg.appendChild(p);
         
-        // Label
+        // Percentage label on slice
         const midA=(a0+a1)/2;
-        const labelR=r+25;
-        const lx=cx+labelR*Math.cos(midA);
-        const ly=cy+labelR*Math.sin(midA);
+        const pctR=r*0.7;
+        const px=cx+pctR*Math.cos(midA);
+        const py=cy+pctR*Math.sin(midA);
         
-        if((val/total)*100>=5){
+        if((val/total)*100>=8){
           const t=document.createElementNS(svg.namespaceURI,"text");
-          t.setAttribute("x",lx);t.setAttribute("y",ly);t.setAttribute("text-anchor","middle");
-          t.setAttribute("font-size","10");t.setAttribute("font-weight","600");t.setAttribute("fill","#0f172a");
+          t.setAttribute("x",px);t.setAttribute("y",py+4);t.setAttribute("text-anchor","middle");
+          t.setAttribute("font-size","14");t.setAttribute("font-weight","700");t.setAttribute("fill","#ffffff");
+          t.setAttribute("stroke","#000000");t.setAttribute("stroke-width","0.5");t.setAttribute("paint-order","stroke");
           t.textContent=((val/total)*100).toFixed(0)+'%';
           svg.appendChild(t);
         }
         
         a0=a1;
+      });
+      
+      // Legend below
+      let legendY=175;
+      entries.forEach(([label,val],i)=>{
+        const legendX=i%2===0?15:125;
+        if(i>0 && i%2===0) legendY+=18;
+        
+        const rect=document.createElementNS(svg.namespaceURI,"rect");
+        rect.setAttribute("x",legendX);rect.setAttribute("y",legendY-10);
+        rect.setAttribute("width","12");rect.setAttribute("height","12");
+        rect.setAttribute("fill",colors[i%colors.length]);rect.setAttribute("rx","2");
+        svg.appendChild(rect);
+        
+        const text=document.createElementNS(svg.namespaceURI,"text");
+        text.setAttribute("x",legendX+16);text.setAttribute("y",legendY);
+        text.setAttribute("font-size","11");text.setAttribute("font-weight","500");text.setAttribute("fill","#475569");
+        text.textContent=label.length>12?label.substring(0,12)+'...':label;
+        svg.appendChild(text);
       });
     }
     
@@ -1178,21 +1198,22 @@
         const x=pad+i*stepX;
         const label=new Date(v.month+'-01').toLocaleDateString('pt-BR',{month:'short'});
         const txt=document.createElementNS(chartEv.namespaceURI,"text");
-        txt.setAttribute("x",x);txt.setAttribute("y",H-pad+20);
-        txt.setAttribute("text-anchor","middle");txt.setAttribute("font-size","11");
-        txt.setAttribute("fill","#64748b");txt.textContent=label;
+        txt.setAttribute("x",x);txt.setAttribute("y",H-pad+22);
+        txt.setAttribute("text-anchor","middle");txt.setAttribute("font-size","13");
+        txt.setAttribute("font-weight","600");txt.setAttribute("fill","#475569");
+        txt.textContent=label;
         chartEv.appendChild(txt);
       });
       
       // Legend
       const leg1=document.createElementNS(chartEv.namespaceURI,"text");
-      leg1.setAttribute("x","20");leg1.setAttribute("y","20");
-      leg1.setAttribute("font-size","12");leg1.setAttribute("fill","#ea580c");
+      leg1.setAttribute("x","25");leg1.setAttribute("y","25");
+      leg1.setAttribute("font-size","14");leg1.setAttribute("font-weight","600");leg1.setAttribute("fill","#ea580c");
       leg1.textContent="● Despesas";chartEv.appendChild(leg1);
       
       const leg2=document.createElementNS(chartEv.namespaceURI,"text");
-      leg2.setAttribute("x","20");leg2.setAttribute("y","38");
-      leg2.setAttribute("font-size","12");leg2.setAttribute("fill","#16a34a");
+      leg2.setAttribute("x","25");leg2.setAttribute("y","45");
+      leg2.setAttribute("font-size","14");leg2.setAttribute("font-weight","600");leg2.setAttribute("fill","#16a34a");
       leg2.textContent="● Investimentos";chartEv.appendChild(leg2);
     }
     
