@@ -196,8 +196,8 @@
     <!-- Gráficos -->
     <div class="grid cols-3" style="margin-top:12px">
       <div class="card"><div class="hd">📊 Comparativo</div><div class="bd"><svg id="chartBars" class="chart" viewBox="0 0 600 220"></svg></div></div>
-      <div class="card"><div class="hd">🎨 Despesas por Tag</div><div class="bd"><svg id="chartPie" class="chart" viewBox="0 0 220 235" style="height:240px"></svg></div></div>
-      <div class="card"><div class="hd">💎 Investimentos por Categoria</div><div class="bd"><svg id="chartPieInv" class="chart" viewBox="0 0 220 235" style="height:240px"></svg></div></div>
+      <div class="card"><div class="hd">🎨 Despesas por Tag</div><div class="bd"><svg id="chartPie" class="chart" viewBox="0 0 220 245" style="height:250px"></svg></div></div>
+      <div class="card"><div class="hd">💎 Investimentos por Categoria</div><div class="bd"><svg id="chartPieInv" class="chart" viewBox="0 0 220 245" style="height:250px"></svg></div></div>
     </div>
   </div>
 
@@ -658,9 +658,9 @@
         
         if((val/total)*100>=8){
           const t=document.createElementNS(svg.namespaceURI,"text");
-          t.setAttribute("x",px);t.setAttribute("y",py+4);t.setAttribute("text-anchor","middle");
-          t.setAttribute("font-size","14");t.setAttribute("font-weight","700");t.setAttribute("fill","#ffffff");
-          t.setAttribute("stroke","#000000");t.setAttribute("stroke-width","0.5");t.setAttribute("paint-order","stroke");
+          t.setAttribute("x",px);t.setAttribute("y",py+5);t.setAttribute("text-anchor","middle");
+          t.setAttribute("font-size","16");t.setAttribute("font-weight","700");t.setAttribute("fill","#ffffff");
+          t.setAttribute("stroke","#000000");t.setAttribute("stroke-width","0.8");t.setAttribute("paint-order","stroke");
           t.textContent=((val/total)*100).toFixed(0)+'%';
           svg.appendChild(t);
         }
@@ -669,21 +669,21 @@
       });
       
       // Legend below
-      let legendY=175;
+      let legendY=178;
       entries.forEach(([label,val],i)=>{
-        const legendX=i%2===0?15:125;
-        if(i>0 && i%2===0) legendY+=18;
+        const legendX=i%2===0?12:118;
+        if(i>0 && i%2===0) legendY+=22;
         
         const rect=document.createElementNS(svg.namespaceURI,"rect");
-        rect.setAttribute("x",legendX);rect.setAttribute("y",legendY-10);
-        rect.setAttribute("width","12");rect.setAttribute("height","12");
-        rect.setAttribute("fill",colors[i%colors.length]);rect.setAttribute("rx","2");
+        rect.setAttribute("x",legendX);rect.setAttribute("y",legendY-12);
+        rect.setAttribute("width","16");rect.setAttribute("height","16");
+        rect.setAttribute("fill",colors[i%colors.length]);rect.setAttribute("rx","3");
         svg.appendChild(rect);
         
         const text=document.createElementNS(svg.namespaceURI,"text");
-        text.setAttribute("x",legendX+16);text.setAttribute("y",legendY);
-        text.setAttribute("font-size","11");text.setAttribute("font-weight","500");text.setAttribute("fill","#475569");
-        text.textContent=label.length>12?label.substring(0,12)+'...':label;
+        text.setAttribute("x",legendX+20);text.setAttribute("y",legendY);
+        text.setAttribute("font-size","14");text.setAttribute("font-weight","600");text.setAttribute("fill","#334155");
+        text.textContent=label.length>11?label.substring(0,11)+'...':label;
         svg.appendChild(text);
       });
     }
